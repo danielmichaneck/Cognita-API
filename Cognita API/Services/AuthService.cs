@@ -103,8 +103,12 @@ public class AuthService : IAuthService
         var user = new ApplicationUser
         {
             Email = userForRegistration.Email,
-            
-            User = new Cognita_Shared.Entities.User {CourseId = userForRegistration.CourseId, Name = userForRegistration.Name }
+
+            User = new Cognita_Shared.Entities.User
+            {
+                CourseId = userForRegistration.CourseId,
+                Name = userForRegistration.Name
+            }
         };
 
         IdentityResult result = await userManager.CreateAsync(user, userForRegistration.Password!);

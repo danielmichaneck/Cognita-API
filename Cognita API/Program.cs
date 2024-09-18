@@ -1,8 +1,8 @@
 using Cognita.API.Extensions;
+using Cognita.API.Models.Entities;
 using Cognita_API.Infrastructure.Data;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Options;
-using System.Configuration;
 
 namespace Cognita_API
 {
@@ -22,7 +22,20 @@ namespace Cognita_API
             builder.Services.AddSwaggerGen();
             builder.Services.AddDbContext<CognitaDbContext>(Options =>
                 Options.UseSqlite(builder.Configuration.GetConnectionString("Cognita_APIContext"))
-            ) ;
+            );
+
+            builder
+                .Services.AddIdentityCore<ApplicationUser>(opt =>
+                {
+                    opt.Password.RequireDigit = false;
+                    opt.Password.RequireLowercase = false;
+                    opt.Password.RequireUppercase = false;
+                    opt.Password.RequireNonAlphanumeric = false;
+                    opt.Password.RequiredLength = 3;
+                })
+                .AddRoles<IdentityRole>()
+                .AddEntityFrameworkStores<CognitaDbContext>()
+                .AddDefaultTokenProviders();
 
             var app = builder.Build();
 
