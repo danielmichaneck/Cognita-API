@@ -1,3 +1,4 @@
+using Cognita.API.Extensions;
 
 namespace Cognita_API
 {
@@ -10,7 +11,9 @@ namespace Cognita_API
             // Add services to the container.
 
             builder.Services.AddControllers();
-            // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
+            builder.Services.ConfigureJwt(builder.Configuration);
+            builder.Services.ConfigureCors();
+            builder.Services.ConfigureServices();
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();
 
@@ -24,9 +27,8 @@ namespace Cognita_API
             }
 
             app.UseHttpsRedirection();
-
+            app.UseCors("AllowAll");
             app.UseAuthorization();
-
 
             app.MapControllers();
 
