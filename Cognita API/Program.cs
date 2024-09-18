@@ -1,4 +1,8 @@
 using Cognita.API.Extensions;
+using Cognita_API.Infrastructure.Data;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
+using System.Configuration;
 
 namespace Cognita_API
 {
@@ -16,6 +20,9 @@ namespace Cognita_API
             builder.Services.ConfigureServices();
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();
+            builder.Services.AddDbContext<CognitaDbContext>(Options =>
+                Options.UseSqlite(builder.Configuration.GetConnectionString("Cognita_APIContext"))
+            ) ;
 
             var app = builder.Build();
 

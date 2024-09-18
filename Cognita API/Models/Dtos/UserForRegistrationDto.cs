@@ -4,8 +4,8 @@ namespace Cognita.API.Models.Dtos;
 
 public record UserForRegistrationDto
 {
-    [Required(ErrorMessage = "Username is required")]
-    public string? UserName { get; init; }
+    [Required(ErrorMessage = "Name is required")]
+    public required string Name { get; init; }
 
     [Required(ErrorMessage = "Password is required")]
     public string? Password { get; init; }
@@ -13,4 +13,7 @@ public record UserForRegistrationDto
     [Required(ErrorMessage = "Email is required")]
     [EmailAddress]
     public string? Email { get; init; }
+
+    [Required(ErrorMessage = "CourseId is required")]
+    public int CourseId { get; init; }
 }

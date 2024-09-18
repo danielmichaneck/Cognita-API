@@ -3,7 +3,7 @@
 Look through the provided code and se whats included.
 
 1. Add secret key in user secret: "secretkey" : "YourSuperSecretKey1234567890987654321!!!!!!!!!!!!!!!!!!!!"
-2. Create Controller, You cant scaffold ApplicationUser. Create a new Entity and scaffold using that entity. Remove Controller and created DbSet in Context.
+2. Create Controller, You cant scaffold ApplicationUser. Create a new Entity and scaffold using that entity. Remove Controller and create DbSet in Context.
 3. Configure IdentityDbContext to use IdentityDbContext with ApplicationUser and role
 4. Add IdentityCore to servicecollection in Program.cs
 5. Add-Migration
