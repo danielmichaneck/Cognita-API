@@ -9,7 +9,7 @@ public interface ICourseService
 
     CourseDto GetSingleCourse();
 
-    bool EditCourse(CourseForUpdateDto dto);
+    bool EditCourse(int id, CourseForUpdateDto dto);
 
     CourseDto CreateCourse(CourseForCreationDto dto);
 }

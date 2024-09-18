@@ -9,6 +9,12 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cognita Shared", "Cognita S
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cognita Service.Contracts", "Cognita Service.Contracts\Cognita Service.Contracts.csproj", "{09680B58-19B6-4CE1-9F0A-0A76A5919668}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cognita Service", "Cognita Service\Cognita Service.csproj", "{CDC6C464-B149-41A3-ADC1-BC920E1E7B8A}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cognita Domain.Contracts", "Cognita Domain.Contracts\Cognita Domain.Contracts.csproj", "{41FC34FB-7D52-48A5-8FBF-CA12D2B7A2C6}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cognita Domain.Repositories", "Cognita Domain.Repositories\Cognita Domain.Repositories.csproj", "{288F9B2E-93D0-484D-8388-ED2F6C78F86D}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -27,6 +33,18 @@ Global
 		{09680B58-19B6-4CE1-9F0A-0A76A5919668}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{09680B58-19B6-4CE1-9F0A-0A76A5919668}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{09680B58-19B6-4CE1-9F0A-0A76A5919668}.Release|Any CPU.Build.0 = Release|Any CPU
+		{CDC6C464-B149-41A3-ADC1-BC920E1E7B8A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{CDC6C464-B149-41A3-ADC1-BC920E1E7B8A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{CDC6C464-B149-41A3-ADC1-BC920E1E7B8A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{CDC6C464-B149-41A3-ADC1-BC920E1E7B8A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{41FC34FB-7D52-48A5-8FBF-CA12D2B7A2C6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{41FC34FB-7D52-48A5-8FBF-CA12D2B7A2C6}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{41FC34FB-7D52-48A5-8FBF-CA12D2B7A2C6}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{41FC34FB-7D52-48A5-8FBF-CA12D2B7A2C6}.Release|Any CPU.Build.0 = Release|Any CPU
+		{288F9B2E-93D0-484D-8388-ED2F6C78F86D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{288F9B2E-93D0-484D-8388-ED2F6C78F86D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{288F9B2E-93D0-484D-8388-ED2F6C78F86D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{288F9B2E-93D0-484D-8388-ED2F6C78F86D}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
