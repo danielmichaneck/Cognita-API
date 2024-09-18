@@ -61,8 +61,8 @@ public class AuthService : IAuthService
         var jwtSettings = configuration.GetSection("JwtSettings");
 
         var tokenOptions = new JwtSecurityToken(
-            issuer: configuration["Issuer"],
-            audience: configuration["Audience"],
+            issuer: jwtSettings["Issuer"],
+            audience: jwtSettings["Audience"],
             claims: claims,
             expires: DateTime.Now.AddMinutes(Convert.ToDouble(jwtSettings["Expires"])),
             signingCredentials: signing
@@ -78,7 +78,7 @@ public class AuthService : IAuthService
         var claims = new List<Claim>()
         {
             new Claim(ClaimTypes.Name, user.UserName!),
-            new Claim(ClaimTypes.NameIdentifier, user.Id!),
+            new Claim(ClaimTypes.NameIdentifier, user.Id!)
             //Add more if needed
         };
 
