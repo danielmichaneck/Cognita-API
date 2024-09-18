@@ -1,3 +1,8 @@
+using Cognita.API.Extensions;
+using Cognita.API.Models.Entities;
+using Cognita_API.Infrastructure.Data;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 
 namespace Cognita_API
 {
@@ -10,9 +15,27 @@ namespace Cognita_API
             // Add services to the container.
 
             builder.Services.AddControllers();
-            // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
+            builder.Services.ConfigureJwt(builder.Configuration);
+            builder.Services.ConfigureCors();
+            builder.Services.ConfigureServices();
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();
+            builder.Services.AddDbContext<CognitaDbContext>(Options =>
+                Options.UseSqlite(builder.Configuration.GetConnectionString("Cognita_APIContext"))
+            );
+
+            builder
+                .Services.AddIdentityCore<ApplicationUser>(opt =>
+                {
+                    opt.Password.RequireDigit = false;
+                    opt.Password.RequireLowercase = false;
+                    opt.Password.RequireUppercase = false;
+                    opt.Password.RequireNonAlphanumeric = false;
+                    opt.Password.RequiredLength = 3;
+                })
+                .AddRoles<IdentityRole>()
+                .AddEntityFrameworkStores<CognitaDbContext>()
+                .AddDefaultTokenProviders();
 
             var app = builder.Build();
 
@@ -24,9 +47,9 @@ namespace Cognita_API
             }
 
             app.UseHttpsRedirection();
-
+            app.UseCors("AllowAll");
+            app.UseAuthentication();
             app.UseAuthorization();
-
 
             app.MapControllers();
 
