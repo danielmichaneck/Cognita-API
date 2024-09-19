@@ -7,6 +7,5 @@ public class ApplicationUser : IdentityUser
 {
     public string? RefreshToken { get; set; }
     public DateTime RefreshTokenExpireTime { get; set; }
-
     public required User User { get; set; }
 }
