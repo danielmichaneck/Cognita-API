@@ -16,13 +16,11 @@ public class CourseRepository : RepositoryBase<Course>, ICourseRepository
         await CreateAsync(course);
     }
 
-    public bool EditCourseAsync(int id, Course course)
-    {
-        throw new NotImplementedException();
-    }
+    //TODO Delete?
+    // public Task<bool> EditCourseAsync(int id, Course course) { }
 
     public async Task<IEnumerable<Course>> GetAllCoursesAsync() => await GetAll().ToListAsync();
 
-    public async Task<Course?> GetSingleCourseAsync(int id) =>
-        await GetByCondition(c => c.CourseId == id).FirstOrDefaultAsync();
+    public async Task<Course?> GetSingleCourseAsync(int id, bool trackChanges) =>
+        await GetByCondition(c => c.CourseId == id, trackChanges).FirstOrDefaultAsync();
 }

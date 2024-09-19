@@ -1,15 +1,15 @@
 using System;
-using Cognita_Shared.Dtos;
+using Cognita_Shared.Dtos.Course;
 
 namespace Cognita_Service.Contracts;
 
 public interface ICourseService
 {
-    IEnumerable<CourseDto> GetCourses();
+    Task<IEnumerable<CourseDto>> GetCoursesAsync();
 
-    CourseDto GetSingleCourse();
+    Task<CourseDto> GetSingleCourseAsync(int id);
 
-    bool EditCourse(int id, CourseForUpdateDto dto);
+    Task<bool> EditCourseAsync(int id, CourseForUpdateDto dto);
 
-    CourseDto CreateCourse(CourseForCreationDto dto);
+    Task<CourseDto> CreateCourseAsync(CourseForCreationDto dto);
 }

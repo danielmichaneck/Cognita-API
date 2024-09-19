@@ -3,6 +3,11 @@
   <ItemGroup>
     <ProjectReference Include="..\Cognita Service.Contracts\Cognita Service.Contracts.csproj" />
     <ProjectReference Include="..\Cognita Shared\Cognita Shared.csproj" />
+    <ProjectReference Include="..\Cognita Domain.Contracts\Cognita Domain.Contracts.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="AutoMapper" Version="13.0.1" />
   </ItemGroup>
 
   <PropertyGroup>

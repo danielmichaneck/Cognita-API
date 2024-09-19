@@ -4,5 +4,8 @@ namespace Cognita_Domain.Contracts;
 
 public interface IUoW
 {
-    ICourseRepository courseRepository { get; }
+    ICourseRepository CourseRepository { get; }
+    IModuleRepository ModuleRepository { get; }
+
+    Task CompleteAsync();
 }

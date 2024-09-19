@@ -1,8 +1,8 @@
 using System;
 
-namespace Cognita_Shared.Dtos;
+namespace Cognita_Shared.Dtos.Course;
 
-public class CourseForUpdateDto
+public class CourseForCreationDto
 {
     public required string CourseName { get; set; }
     public required string Description { get; set; }
