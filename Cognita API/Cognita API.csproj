@@ -25,6 +25,7 @@
 
 	<ItemGroup>
 	  <ProjectReference Include="..\Cognita Shared\Cognita Shared.csproj" />
+	  <ProjectReference Include="..\Cognita Service.Contracts\Cognita Service.Contracts.csproj" />
 	</ItemGroup>
 
 </Project>
