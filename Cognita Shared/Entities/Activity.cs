@@ -14,6 +14,9 @@ namespace Cognita_Shared.Entities {
 
         //Foreign Key
         public int ModuleId { get; set; }
-        public int ActivityTypeId { get; set; }
+        public int? ActivityTypeId { get; set; }
+
+        //Navigationprops
+        public ActivityType ActivityType { get; set; }
     }
 }

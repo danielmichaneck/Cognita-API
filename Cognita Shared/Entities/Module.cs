@@ -14,5 +14,8 @@ namespace Cognita_Shared.Entities {
 
         // Foreign Key
         public int CourseId { get; set; }
+
+        //Navigationprops
+        public ICollection<Activity> Activities { get; set; }
     }
 }

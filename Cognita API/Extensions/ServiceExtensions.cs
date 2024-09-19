@@ -1,10 +1,12 @@
 ﻿using System.Text;
 using Cognita.API.Service.Contracts;
 using Cognita.API.Services;
+using Cognita_API.Infrastructure.Data;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
+using MovieCardsAPI.Data;
 
 namespace Cognita.API.Extensions;
 
@@ -93,5 +95,19 @@ public static class ServiceExtensions
                     IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(secretkey))
                 };
             });
+    }
+
+    public static async Task SeedDataAsync(this IApplicationBuilder app) {
+        using (var scope = app.ApplicationServices.CreateScope()) {
+            var serviceProvider = scope.ServiceProvider;
+            var context = serviceProvider.GetRequiredService<CognitaDbContext>();
+
+            try {
+                await SeedData.InitAsync(context);
+            } catch (Exception ex) {
+                Console.WriteLine(ex.Message);
+                throw;
+            }
+        }
     }
 }
