@@ -2,11 +2,14 @@
 using Cognita.API.Service.Contracts;
 using Cognita.API.Services;
 using Cognita_API.Infrastructure.Data;
-using Microsoft.AspNetCore.Authentication;
+using Cognita_Domain.Contracts;
+using Cognita_Domain.Repositories;
+using Cognita_Infrastructure.Data;
+using Cognita_Service;
+using Cognita_Service.Contracts;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
-using MovieCardsAPI.Data;
 
 namespace Cognita.API.Extensions;
 
@@ -61,9 +64,39 @@ public static class ServiceExtensions
     public static void ConfigureServices(this IServiceCollection services)
     {
         services.AddScoped<IServiceManager, ServiceManager>();
+        services.AddScoped<ICourseService, CourseService>();
+        services.AddScoped<IModuleService, ModuleService>();
+        services.AddScoped<IUserService, UserService>();
         services.AddScoped<IAuthService, AuthService>();
+
         services.AddScoped(provider => new Lazy<IAuthService>(
             () => provider.GetRequiredService<IAuthService>()
+        ));
+        services.AddScoped(provider => new Lazy<ICourseService>(
+            () => provider.GetRequiredService<ICourseService>()
+        ));
+        services.AddScoped(provider => new Lazy<IModuleService>(
+            () => provider.GetRequiredService<IModuleService>()
+        ));
+        services.AddScoped(provider => new Lazy<IUserService>(
+            () => provider.GetRequiredService<IUserService>()
+        ));
+    }
+
+    public static void ConfigureRepositories(this IServiceCollection services)
+    {
+        services.AddScoped<IUoW, UoW>();
+        services.AddScoped<ICourseRepository, CourseRepository>();
+        services.AddScoped<IModuleRepository, ModuleRepository>();
+        services.AddScoped<IUserRepository, UserRepository>();
+        services.AddScoped(provider => new Lazy<ICourseRepository>(
+            () => provider.GetRequiredService<ICourseRepository>()
+        ));
+        services.AddScoped(provider => new Lazy<IModuleRepository>(
+            () => provider.GetRequiredService<IModuleRepository>()
+        ));
+        services.AddScoped(provider => new Lazy<IUserRepository>(
+            () => provider.GetRequiredService<IUserRepository>()
         ));
     }
 
@@ -97,14 +130,19 @@ public static class ServiceExtensions
             });
     }
 
-    public static async Task SeedDataAsync(this IApplicationBuilder app) {
-        using (var scope = app.ApplicationServices.CreateScope()) {
+    public static async Task SeedDataAsync(this IApplicationBuilder app)
+    {
+        using (var scope = app.ApplicationServices.CreateScope())
+        {
             var serviceProvider = scope.ServiceProvider;
             var context = serviceProvider.GetRequiredService<CognitaDbContext>();
 
-            try {
+            try
+            {
                 await SeedData.InitAsync(context);
-            } catch (Exception ex) {
+            }
+            catch (Exception ex)
+            {
                 Console.WriteLine(ex.Message);
                 throw;
             }

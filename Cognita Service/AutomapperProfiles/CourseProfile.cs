@@ -1,6 +1,6 @@
 using System;
 using AutoMapper;
-using Cognita_Shared.Dtos;
+using Cognita_Shared.Dtos.Course;
 using Cognita_Shared.Entities;
 
 namespace Cognita_Service.AutomapperProfiles;

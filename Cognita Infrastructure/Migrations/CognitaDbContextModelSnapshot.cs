@@ -124,7 +124,7 @@ namespace Cognita_API.Migrations
 
                     b.HasIndex("ModuleId");
 
-                    b.ToTable("Activity");
+                    b.ToTable("Activity", (string)null);
                 });
 
             modelBuilder.Entity("Cognita_Shared.Entities.ActivityType", b =>
@@ -139,7 +139,7 @@ namespace Cognita_API.Migrations
 
                     b.HasKey("ActivityTypeId");
 
-                    b.ToTable("ActivityType");
+                    b.ToTable("ActivityType", (string)null);
                 });
 
             modelBuilder.Entity("Cognita_Shared.Entities.Course", b =>
@@ -164,7 +164,7 @@ namespace Cognita_API.Migrations
 
                     b.HasKey("CourseId");
 
-                    b.ToTable("Course");
+                    b.ToTable("Course", (string)null);
                 });
 
             modelBuilder.Entity("Cognita_Shared.Entities.Document", b =>
@@ -211,7 +211,7 @@ namespace Cognita_API.Migrations
 
                     b.HasIndex("ModuleId");
 
-                    b.ToTable("Document");
+                    b.ToTable("Document", (string)null);
                 });
 
             modelBuilder.Entity("Cognita_Shared.Entities.Module", b =>
@@ -241,7 +241,7 @@ namespace Cognita_API.Migrations
 
                     b.HasIndex("CourseId");
 
-                    b.ToTable("Module");
+                    b.ToTable("Module", (string)null);
                 });
 
             modelBuilder.Entity("Cognita_Shared.Entities.User", b =>
@@ -259,7 +259,7 @@ namespace Cognita_API.Migrations
 
                     b.HasKey("UserId");
 
-                    b.ToTable("User");
+                    b.ToTable("User", (string)null);
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole", b =>

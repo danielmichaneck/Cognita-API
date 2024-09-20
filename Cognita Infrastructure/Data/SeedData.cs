@@ -1,22 +1,15 @@
 ﻿using Bogus;
-using Microsoft.EntityFrameworkCore;
-using System.Collections.Generic;
-using System.Globalization;
-using Bogus.DataSets;
 using Cognita_API.Infrastructure.Data;
-using Microsoft.AspNetCore.Identity;
-using Cognita.API.Models.Entities;
 using Cognita_Shared.Entities;
-using System.IO;
-using System;
-using Microsoft.Extensions.Hosting;
+using Microsoft.EntityFrameworkCore;
 
-namespace MovieCardsAPI.Data {
-
+namespace Cognita_Infrastructure.Data
+{
     /*
      drop-database & update-database to clear out the database for fresh seeding.
      */
-    internal class SeedData {
+    public class SeedData
+    {
         private static Faker faker = new Faker("sv");
         private static Random random = new Random();
 
@@ -26,9 +19,10 @@ namespace MovieCardsAPI.Data {
         private const string userRole = "Student";
         private const string adminRole = "Admin";*/
 
-        internal static async Task InitAsync(CognitaDbContext context) {
-
-            if (await context.Course.AnyAsync()) return;
+        public static async Task InitAsync(CognitaDbContext context)
+        {
+            if (await context.Course.AnyAsync())
+                return;
 
             //userManager = servicesProvider.GetRequiredService<UserManager<ApplicationUser>>();
             //roleManager = servicesProvider.GetRequiredService<RoleManager<IdentityRole>>();
@@ -64,37 +58,42 @@ namespace MovieCardsAPI.Data {
 
                 throw;
             }*/
-
-
         }
 
-        private static IEnumerable<ActivityType> GenerateActivityTypes(string[] activityTypeArray) {
+        private static IEnumerable<ActivityType> GenerateActivityTypes(string[] activityTypeArray)
+        {
             List<ActivityType> activityTypes = new List<ActivityType>();
-            foreach (string activityType in activityTypeArray) {
-                activityTypes.Add(new ActivityType {
-                    Title = activityType
-                }); ;
+            foreach (string activityType in activityTypeArray)
+            {
+                activityTypes.Add(new ActivityType { Title = activityType });
+                ;
             }
             return activityTypes;
         }
 
-        private static IEnumerable<Activity> GenerateActivities(int nrOfActivities, IEnumerable<ActivityType> activityTypes) {
+        private static IEnumerable<Activity> GenerateActivities(
+            int nrOfActivities,
+            IEnumerable<ActivityType> activityTypes
+        )
+        {
             var activities = new List<Activity>(nrOfActivities);
 
-            for (int i = 0; i < nrOfActivities; i++) {
-
+            for (int i = 0; i < nrOfActivities; i++)
+            {
                 var randomDate = faker.Date.Future(1, DateTime.Now);
                 var randomDayIncrement = random.Next(1, 10);
                 var randomHourIncrement = random.Next(1, 15);
 
-
                 var name = faker.Lorem.Word();
                 var description = faker.Lorem.Paragraph(2);
                 var startDate = randomDate;
-                var endDate = randomDate.Add(new TimeSpan(randomDayIncrement, randomHourIncrement, 0, 0));
+                var endDate = randomDate.Add(
+                    new TimeSpan(randomDayIncrement, randomHourIncrement, 0, 0)
+                );
                 var type = faker.PickRandom(activityTypes);
 
-                var activity = new Activity() {
+                var activity = new Activity()
+                {
                     ActivityName = name,
                     Description = description,
                     StartDate = startDate,
@@ -107,17 +106,19 @@ namespace MovieCardsAPI.Data {
             return activities;
         }
 
-        private static IEnumerable<Module> GenerateModules(int nrOfModules, int activitiesPerModule, IEnumerable<Activity> activities) {
-            
+        private static IEnumerable<Module> GenerateModules(
+            int nrOfModules,
+            int activitiesPerModule,
+            IEnumerable<Activity> activities
+        )
+        {
             var modules = new List<Module>(nrOfModules);
             var activityArray = activities.ToArray();
             int activityIndex = 0;
 
-
-            for (int i = 0; i < nrOfModules; i++) {
-
+            for (int i = 0; i < nrOfModules; i++)
+            {
                 var slicedPosts = activityArray.Skip(activityIndex).Take(2);
-
 
                 var randomDate = faker.Date.Future(1, DateTime.Now);
                 var randomDayIncrement = random.Next(12, 20);
@@ -125,9 +126,12 @@ namespace MovieCardsAPI.Data {
                 var name = faker.Lorem.Word();
                 var description = faker.Lorem.Paragraph(2);
                 var startDate = DateOnly.FromDateTime(randomDate);
-                var endDate = DateOnly.FromDateTime(randomDate.Add(new TimeSpan(randomDayIncrement, 0, 0, 0)));
+                var endDate = DateOnly.FromDateTime(
+                    randomDate.Add(new TimeSpan(randomDayIncrement, 0, 0, 0))
+                );
 
-                var module = new Module() {
+                var module = new Module()
+                {
                     ModuleName = name,
                     Description = description,
                     StartDate = startDate,
@@ -141,17 +145,19 @@ namespace MovieCardsAPI.Data {
             return modules;
         }
 
-        private static IEnumerable<Course> GenerateCourses(int nrOfCourses, int modulesPerCourse, IEnumerable<Module> modules) {
-
+        private static IEnumerable<Course> GenerateCourses(
+            int nrOfCourses,
+            int modulesPerCourse,
+            IEnumerable<Module> modules
+        )
+        {
             var courses = new List<Course>(nrOfCourses);
             var moduleArray = modules.ToArray();
             int moduleIndex = 0;
 
-
-            for (int i = 0; i < nrOfCourses; i++) {
-
+            for (int i = 0; i < nrOfCourses; i++)
+            {
                 var slicedPosts = moduleArray.Skip(moduleIndex).Take(2);
-
 
                 var randomDate = faker.Date.Future(1, DateTime.Now);
                 var randomDayIncrement = random.Next(25, 60);
@@ -159,9 +165,12 @@ namespace MovieCardsAPI.Data {
                 var name = faker.Lorem.Word();
                 var description = faker.Lorem.Paragraph(2);
                 var startDate = DateOnly.FromDateTime(randomDate);
-                var endDate = DateOnly.FromDateTime(randomDate.Add(new TimeSpan(randomDayIncrement, 0, 0, 0)));
+                var endDate = DateOnly.FromDateTime(
+                    randomDate.Add(new TimeSpan(randomDayIncrement, 0, 0, 0))
+                );
 
-                var course = new Course() {
+                var course = new Course()
+                {
                     CourseName = name,
                     Description = description,
                     StartDate = startDate,

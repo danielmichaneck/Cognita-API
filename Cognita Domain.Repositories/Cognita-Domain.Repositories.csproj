@@ -1,8 +1,8 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <ItemGroup>
-    <ProjectReference Include="..\Cognita API\Cognita API.csproj" />
-    <ProjectReference Include="..\Cognita Domain.Contracts\Cognita Domain.Contracts.csproj" />
+    <ProjectReference Include="..\Cognita Domain.Contracts\Cognita-Domain.Contracts.csproj" />
+    <ProjectReference Include="..\Cognita Infrastructure\Cognita-Infrastructure.csproj" />
   </ItemGroup>
 
   <PropertyGroup>
