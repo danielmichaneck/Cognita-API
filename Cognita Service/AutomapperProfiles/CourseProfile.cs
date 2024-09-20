@@ -5,7 +5,7 @@ using Cognita_Shared.Entities;
 
 namespace Cognita_Service.AutomapperProfiles;
 
-public class CourseProfile : Profile
+internal class CourseProfile : Profile
 {
     public CourseProfile()
     {
