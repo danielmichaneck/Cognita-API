@@ -9,13 +9,7 @@
   </PropertyGroup>
 
 	<ItemGroup>
-		<PackageReference Include="Bogus" Version="35.6.1" />
-		<PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="8.0.8" />
 		<PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="8.0.8" />
-		<PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="8.0.8">
-		  <PrivateAssets>all</PrivateAssets>
-		  <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-		</PackageReference>
 		<PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="8.0.5" />
 		<PackageReference Include="Swashbuckle.AspNetCore" Version="6.4.0" />
 		<PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="8.0.2" />
@@ -26,6 +20,9 @@
 	<ItemGroup>
 	  <ProjectReference Include="..\Cognita Shared\Cognita Shared.csproj" />
 	  <ProjectReference Include="..\Cognita Service.Contracts\Cognita Service.Contracts.csproj" />
+	  <ProjectReference Include="..\Cognita Service\Cognita Service.csproj" />
+	  <ProjectReference Include="..\Cognita Infrastructure\Cognita Infrastructure.csproj" />
+	  <ProjectReference Include="..\Cognita Domain.Repositories\Cognita Domain.Repositories.csproj" />
 	</ItemGroup>
 
 </Project>

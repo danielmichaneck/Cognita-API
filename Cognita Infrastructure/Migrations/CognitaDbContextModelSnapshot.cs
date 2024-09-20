@@ -17,7 +17,7 @@ namespace Cognita_API.Migrations
 #pragma warning disable 612, 618
             modelBuilder.HasAnnotation("ProductVersion", "8.0.8");
 
-            modelBuilder.Entity("Cognita.API.Models.Entities.ApplicationUser", b =>
+            modelBuilder.Entity("Cognita_Infrastructure.Models.Entities.ApplicationUser", b =>
                 {
                     b.Property<string>("Id")
                         .HasColumnType("TEXT");
@@ -102,7 +102,7 @@ namespace Cognita_API.Migrations
                         .IsRequired()
                         .HasColumnType("TEXT");
 
-                    b.Property<int>("ActivityTypeId")
+                    b.Property<int?>("ActivityTypeId")
                         .HasColumnType("INTEGER");
 
                     b.Property<string>("Description")
@@ -390,7 +390,7 @@ namespace Cognita_API.Migrations
                     b.ToTable("AspNetUserTokens", (string)null);
                 });
 
-            modelBuilder.Entity("Cognita.API.Models.Entities.ApplicationUser", b =>
+            modelBuilder.Entity("Cognita_Infrastructure.Models.Entities.ApplicationUser", b =>
                 {
                     b.HasOne("Cognita_Shared.Entities.User", "User")
                         .WithMany()
@@ -405,9 +405,7 @@ namespace Cognita_API.Migrations
                 {
                     b.HasOne("Cognita_Shared.Entities.ActivityType", "ActivityType")
                         .WithMany()
-                        .HasForeignKey("ActivityTypeId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("ActivityTypeId");
 
                     b.HasOne("Cognita_Shared.Entities.Module", null)
                         .WithMany("Activities")
@@ -453,7 +451,7 @@ namespace Cognita_API.Migrations
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserClaim<string>", b =>
                 {
-                    b.HasOne("Cognita.API.Models.Entities.ApplicationUser", null)
+                    b.HasOne("Cognita_Infrastructure.Models.Entities.ApplicationUser", null)
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -462,7 +460,7 @@ namespace Cognita_API.Migrations
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserLogin<string>", b =>
                 {
-                    b.HasOne("Cognita.API.Models.Entities.ApplicationUser", null)
+                    b.HasOne("Cognita_Infrastructure.Models.Entities.ApplicationUser", null)
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -477,7 +475,7 @@ namespace Cognita_API.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("Cognita.API.Models.Entities.ApplicationUser", null)
+                    b.HasOne("Cognita_Infrastructure.Models.Entities.ApplicationUser", null)
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -486,7 +484,7 @@ namespace Cognita_API.Migrations
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserToken<string>", b =>
                 {
-                    b.HasOne("Cognita.API.Models.Entities.ApplicationUser", null)
+                    b.HasOne("Cognita_Infrastructure.Models.Entities.ApplicationUser", null)
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)

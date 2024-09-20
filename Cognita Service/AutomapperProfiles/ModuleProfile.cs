@@ -5,7 +5,7 @@ using Cognita_Shared.Dtos.Module;
 
 namespace Cognita_Service.AutomapperProfiles;
 
-internal class ModuleProfile : Profile
+public class ModuleProfile : Profile
 {
     public ModuleProfile()
     {

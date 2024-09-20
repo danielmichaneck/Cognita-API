@@ -1,9 +1,8 @@
-﻿using Cognita.API.Models.Entities;
+﻿using Cognita_Infrastructure.Models.Entities;
 using Cognita_Shared.Entities;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Infrastructure.Internal;
 
 namespace Cognita_API.Infrastructure.Data
 {

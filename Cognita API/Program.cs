@@ -1,6 +1,6 @@
 using Cognita.API.Extensions;
-using Cognita.API.Models.Entities;
 using Cognita_API.Infrastructure.Data;
+using Cognita_Infrastructure.Models.Entities;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
@@ -17,6 +17,8 @@ namespace Cognita_API
             builder.Services.AddControllers();
             builder.Services.ConfigureJwt(builder.Configuration);
             builder.Services.ConfigureCors();
+            builder.Services.AddAutoMapper(typeof(Cognita_Service.AssemblyReference).Assembly);
+            builder.Services.ConfigureRepositories();
             builder.Services.ConfigureServices();
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();
@@ -40,7 +42,8 @@ namespace Cognita_API
             var app = builder.Build();
 
             // Configure the HTTP request pipeline.
-            if (app.Environment.IsDevelopment()) {
+            if (app.Environment.IsDevelopment())
+            {
                 app.UseSwagger();
                 app.UseSwaggerUI();
                 await app.SeedDataAsync();
