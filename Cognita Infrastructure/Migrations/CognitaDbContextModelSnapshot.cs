@@ -17,7 +17,7 @@ namespace Cognita_API.Migrations
 #pragma warning disable 612, 618
             modelBuilder.HasAnnotation("ProductVersion", "8.0.8");
 
-            modelBuilder.Entity("Cognita_Infrastructure.Models.Entities.ApplicationUser", b =>
+            modelBuilder.Entity("Cognita.API.Models.Entities.ApplicationUser", b =>
                 {
                     b.Property<string>("Id")
                         .HasColumnType("TEXT");
@@ -102,7 +102,7 @@ namespace Cognita_API.Migrations
                         .IsRequired()
                         .HasColumnType("TEXT");
 
-                    b.Property<int?>("ActivityTypeId")
+                    b.Property<int>("ActivityTypeId")
                         .HasColumnType("INTEGER");
 
                     b.Property<string>("Description")
@@ -124,7 +124,7 @@ namespace Cognita_API.Migrations
 
                     b.HasIndex("ModuleId");
 
-                    b.ToTable("Activity");
+                    b.ToTable("Activity", (string)null);
                 });
 
             modelBuilder.Entity("Cognita_Shared.Entities.ActivityType", b =>
@@ -139,7 +139,7 @@ namespace Cognita_API.Migrations
 
                     b.HasKey("ActivityTypeId");
 
-                    b.ToTable("ActivityType");
+                    b.ToTable("ActivityType", (string)null);
                 });
 
             modelBuilder.Entity("Cognita_Shared.Entities.Course", b =>
@@ -164,7 +164,7 @@ namespace Cognita_API.Migrations
 
                     b.HasKey("CourseId");
 
-                    b.ToTable("Course");
+                    b.ToTable("Course", (string)null);
                 });
 
             modelBuilder.Entity("Cognita_Shared.Entities.Document", b =>
@@ -211,7 +211,7 @@ namespace Cognita_API.Migrations
 
                     b.HasIndex("ModuleId");
 
-                    b.ToTable("Document");
+                    b.ToTable("Document", (string)null);
                 });
 
             modelBuilder.Entity("Cognita_Shared.Entities.Module", b =>
@@ -241,7 +241,7 @@ namespace Cognita_API.Migrations
 
                     b.HasIndex("CourseId");
 
-                    b.ToTable("Module");
+                    b.ToTable("Module", (string)null);
                 });
 
             modelBuilder.Entity("Cognita_Shared.Entities.User", b =>
@@ -259,7 +259,7 @@ namespace Cognita_API.Migrations
 
                     b.HasKey("UserId");
 
-                    b.ToTable("User");
+                    b.ToTable("User", (string)null);
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole", b =>
@@ -390,7 +390,7 @@ namespace Cognita_API.Migrations
                     b.ToTable("AspNetUserTokens", (string)null);
                 });
 
-            modelBuilder.Entity("Cognita_Infrastructure.Models.Entities.ApplicationUser", b =>
+            modelBuilder.Entity("Cognita.API.Models.Entities.ApplicationUser", b =>
                 {
                     b.HasOne("Cognita_Shared.Entities.User", "User")
                         .WithMany()
@@ -405,7 +405,9 @@ namespace Cognita_API.Migrations
                 {
                     b.HasOne("Cognita_Shared.Entities.ActivityType", "ActivityType")
                         .WithMany()
-                        .HasForeignKey("ActivityTypeId");
+                        .HasForeignKey("ActivityTypeId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.HasOne("Cognita_Shared.Entities.Module", null)
                         .WithMany("Activities")
@@ -451,7 +453,7 @@ namespace Cognita_API.Migrations
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserClaim<string>", b =>
                 {
-                    b.HasOne("Cognita_Infrastructure.Models.Entities.ApplicationUser", null)
+                    b.HasOne("Cognita.API.Models.Entities.ApplicationUser", null)
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -460,7 +462,7 @@ namespace Cognita_API.Migrations
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserLogin<string>", b =>
                 {
-                    b.HasOne("Cognita_Infrastructure.Models.Entities.ApplicationUser", null)
+                    b.HasOne("Cognita.API.Models.Entities.ApplicationUser", null)
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -475,7 +477,7 @@ namespace Cognita_API.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("Cognita_Infrastructure.Models.Entities.ApplicationUser", null)
+                    b.HasOne("Cognita.API.Models.Entities.ApplicationUser", null)
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -484,7 +486,7 @@ namespace Cognita_API.Migrations
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserToken<string>", b =>
                 {
-                    b.HasOne("Cognita_Infrastructure.Models.Entities.ApplicationUser", null)
+                    b.HasOne("Cognita.API.Models.Entities.ApplicationUser", null)
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
