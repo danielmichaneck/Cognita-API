@@ -22,6 +22,7 @@ public class CourseService : ICourseService
     {
         var course = _mapper.Map<Course>(dto);
         await _uow.CourseRepository.CreateCourseAsync(course);
+        await _uow.CompleteAsync();
         return _mapper.Map<CourseDto>(course);
     }
 

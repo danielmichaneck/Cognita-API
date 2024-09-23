@@ -9,10 +9,12 @@ public class RepositoryBase<T>
     where T : class
 {
     protected DbSet<T> DbSet { get; }
+    protected CognitaDbContext Context { get; }
 
     public RepositoryBase(CognitaDbContext context)
     {
         DbSet = context.Set<T>();
+        Context = context;
     }
 
     public async Task CreateAsync(T entity) => await DbSet.AddAsync(entity);

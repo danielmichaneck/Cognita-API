@@ -11,5 +11,5 @@ public interface IModuleService
 
     Task<bool> EditModuleAsync(int id, ModuleForUpdateDto dto);
 
-    Task<ModuleDto> CreateModuleAsync(ModuleForCreationDto dto);
+    Task<ModuleDto> CreateModuleAsync(ModuleForCreationDto dto, int courseId);
 }

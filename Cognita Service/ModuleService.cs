@@ -18,10 +18,11 @@ public class ModuleService : IModuleService
         _uow = uow;
     }
 
-    public async Task<ModuleDto> CreateModuleAsync(ModuleForCreationDto dto)
+    public async Task<ModuleDto> CreateModuleAsync(ModuleForCreationDto dto, int courseId)
     {
         var module = _mapper.Map<Module>(dto);
-        await _uow.ModuleRepository.CreateModuleAsync(module);
+        await _uow.ModuleRepository.CreateModuleAsync(module, courseId);
+        await _uow.CompleteAsync();
         return _mapper.Map<ModuleDto>(module);
     }
 
@@ -49,10 +50,6 @@ public class ModuleService : IModuleService
 
     public async Task<IEnumerable<ModuleDto>> GetModulesAsync(int courseId)
     {
-        //Check if course exists
-
-
-
         var modules = await _uow.ModuleRepository.GetAllModulesAsync(courseId);
         return _mapper.Map<IEnumerable<ModuleDto>>(modules);
     }

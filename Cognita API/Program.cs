@@ -21,7 +21,9 @@ namespace Cognita_API
             builder.Services.ConfigureRepositories();
             builder.Services.ConfigureServices();
             builder.Services.AddEndpointsApiExplorer();
-            builder.Services.AddSwaggerGen();
+            builder.Services.AddSwaggerGen(options => {
+                options.EnableAnnotations();
+            });
             builder.Services.AddDbContext<CognitaDbContext>(Options =>
                 Options.UseSqlite(builder.Configuration.GetConnectionString("Cognita_APIContext"))
             );
