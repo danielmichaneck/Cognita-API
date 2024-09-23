@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace Cognita.API.Models.Dtos;
+namespace Cognita_Infrastructure.Models.Dtos;
 
 public record UserForAuthenticationDto
 {

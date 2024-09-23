@@ -1,4 +1,4 @@
-﻿using Cognita.API.Models.Dtos;
+﻿using Cognita_Infrastructure.Models.Dtos;
 using Microsoft.AspNetCore.Identity;
 
 namespace Cognita.API.Service.Contracts;

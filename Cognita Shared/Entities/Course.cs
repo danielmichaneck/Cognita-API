@@ -12,5 +12,8 @@ namespace Cognita_Shared.Entities  {
         public required string Description { get; set; }
         public DateOnly StartDate { get; set; }
         public DateOnly EndDate { get; set; }
+
+        //Navigationprops
+        public ICollection<Module> Modules { get; set; }
     }
 }

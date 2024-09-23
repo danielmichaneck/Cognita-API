@@ -1,9 +1,9 @@
-﻿using Cognita.API.Models.Dtos;
-using Cognita.API.Service.Contracts;
+﻿using Cognita.API.Service.Contracts;
+using Cognita_Infrastructure.Models.Dtos;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
-namespace Cognita.API.Controllers;
+namespace Cognita_API.Controllers;
 
 [Route("api/authentication")]
 [ApiController]

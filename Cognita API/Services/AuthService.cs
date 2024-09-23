@@ -2,9 +2,9 @@
 using System.Security.Claims;
 using System.Security.Cryptography;
 using System.Text;
-using Cognita.API.Models.Dtos;
-using Cognita.API.Models.Entities;
 using Cognita.API.Service.Contracts;
+using Cognita_Infrastructure.Models.Dtos;
+using Cognita_Infrastructure.Models.Entities;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.IdentityModel.Tokens;
 
