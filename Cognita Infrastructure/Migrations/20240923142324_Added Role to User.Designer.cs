@@ -3,6 +3,7 @@ using System;
 using Cognita_API.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -10,9 +11,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Cognita_API.Migrations
 {
     [DbContext(typeof(CognitaDbContext))]
-    partial class CognitaDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240923142324_Added Role to User")]
+    partial class AddedRoletoUser
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder.HasAnnotation("ProductVersion", "8.0.8");
@@ -262,8 +265,6 @@ namespace Cognita_API.Migrations
 
                     b.HasKey("UserId");
 
-                    b.HasIndex("CourseId");
-
                     b.ToTable("User");
                 });
 
@@ -443,17 +444,6 @@ namespace Cognita_API.Migrations
                         .HasForeignKey("CourseId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-                });
-
-            modelBuilder.Entity("Cognita_Shared.Entities.User", b =>
-                {
-                    b.HasOne("Cognita_Shared.Entities.Course", "Course")
-                        .WithMany()
-                        .HasForeignKey("CourseId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Course");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>

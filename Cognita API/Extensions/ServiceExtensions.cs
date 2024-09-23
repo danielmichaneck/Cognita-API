@@ -135,11 +135,11 @@ public static class ServiceExtensions
         using (var scope = app.ApplicationServices.CreateScope())
         {
             var serviceProvider = scope.ServiceProvider;
-            var context = serviceProvider.GetRequiredService<CognitaDbContext>();
+            //var context = serviceProvider.GetRequiredService<CognitaDbContext>();
 
             try
             {
-                await SeedData.InitAsync(context);
+                await SeedData.InitAsync(serviceProvider);
             }
             catch (Exception ex)
             {
