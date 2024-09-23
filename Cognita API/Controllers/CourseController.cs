@@ -1,14 +1,6 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using AutoMapper;
 using Cognita.API.Service.Contracts;
 using Cognita_Shared.Dtos.Course;
-using Cognita_Shared.Entities;
-using Humanizer;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 using Swashbuckle.AspNetCore.Annotations;
 
 namespace Cognita_API.Controllers

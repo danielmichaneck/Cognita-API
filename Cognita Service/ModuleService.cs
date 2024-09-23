@@ -50,10 +50,6 @@ public class ModuleService : IModuleService
 
     public async Task<IEnumerable<ModuleDto>> GetModulesAsync(int courseId)
     {
-        //Check if course exists
-
-
-
         var modules = await _uow.ModuleRepository.GetAllModulesAsync(courseId);
         return _mapper.Map<IEnumerable<ModuleDto>>(modules);
     }
