@@ -18,10 +18,11 @@ public class ModuleService : IModuleService
         _uow = uow;
     }
 
-    public async Task<ModuleDto> CreateModuleAsync(ModuleForCreationDto dto)
+    public async Task<ModuleDto> CreateModuleAsync(ModuleForCreationDto dto, int courseId)
     {
         var module = _mapper.Map<Module>(dto);
-        await _uow.ModuleRepository.CreateModuleAsync(module);
+        await _uow.ModuleRepository.CreateModuleAsync(module, courseId);
+        await _uow.CompleteAsync();
         return _mapper.Map<ModuleDto>(module);
     }
 

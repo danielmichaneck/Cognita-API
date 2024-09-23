@@ -11,7 +11,19 @@ public class ModuleRepository : RepositoryBase<Module>, IModuleRepository
     public ModuleRepository(CognitaDbContext context)
         : base(context) { }
 
-    public async Task CreateModuleAsync(Module module) => await CreateAsync(module);
+    public async Task CreateModuleAsync(Module module, int courseId)
+    {
+        var course = await Context
+            .Course.Where(c => c.CourseId == courseId)
+            .Include(c => c.Modules)
+            .FirstOrDefaultAsync(c => c.CourseId == courseId);
+
+        //TODO
+        //Throw and catch custom exception
+        ArgumentNullException.ThrowIfNull(course);
+
+        course.Modules.Add(module);
+    }
 
     // public Task<bool> EditModuleAsync(int id, Module module) { }
 
