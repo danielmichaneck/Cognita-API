@@ -1,5 +1,6 @@
 using Cognita.API.Service.Contracts;
 using Cognita_Shared.Dtos.Course;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Swashbuckle.AspNetCore.Annotations;
 
@@ -17,6 +18,7 @@ namespace Cognita_API.Controllers
         }
 
         // GET: api/Courses/
+        [Authorize]
         [HttpGet]
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(CourseDto))]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
