@@ -6,6 +6,11 @@
 #VS-code files
 .vscode
 
+# Custom ignores
+/Cognita Infrastructure/Migrations
+*Db.*
+*.db.sqlite3
+
 # User-specific files
 *.rsuser
 *.suo
