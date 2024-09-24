@@ -1,7 +1,12 @@
 ﻿using Bogus;
 using Cognita_API.Infrastructure.Data;
+using Cognita_Infrastructure.Models.Entities;
 using Cognita_Shared.Entities;
+using Cognita_Shared.Enums;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace Cognita_Infrastructure.Data
 {
@@ -13,20 +18,22 @@ namespace Cognita_Infrastructure.Data
         private static Faker faker = new Faker("sv");
         private static Random random = new Random();
 
-        /*private static UserManager<ApplicationUser> userManager = null!;
+        private static UserManager<ApplicationUser> userManager = null!;
         private static RoleManager<IdentityRole> roleManager = null!;
         private static IConfiguration configuration = null!;
-        private const string userRole = "Student";
+        /*private const string userRole = "Student";
         private const string adminRole = "Admin";*/
 
-        public static async Task InitAsync(CognitaDbContext context)
+        public static async Task InitAsync(IServiceProvider serviceProvider)
         {
+            var context = serviceProvider.GetRequiredService<CognitaDbContext>();
+            
             if (await context.Course.AnyAsync())
                 return;
 
-            //userManager = servicesProvider.GetRequiredService<UserManager<ApplicationUser>>();
-            //roleManager = servicesProvider.GetRequiredService<RoleManager<IdentityRole>>();
-            //configuration = servicesProvider.GetRequiredService<IConfiguration>();
+            userManager = serviceProvider.GetRequiredService<UserManager<ApplicationUser>>();
+            roleManager = serviceProvider.GetRequiredService<RoleManager<IdentityRole>>();
+            configuration = serviceProvider.GetRequiredService<IConfiguration>();
 
 
             string[] activityTypeArray = ["LECTURE", "ASSIGMENT", "ELEARNING"];
@@ -44,6 +51,9 @@ namespace Cognita_Infrastructure.Data
 
             await context.SaveChangesAsync();
 
+            await CreateRolesAsync(new[] { "admin", "regular" });
+            await GenerateUsersAsync(100, courses);
+
             //Null check on services!
             //await db.Database.MigrateAsync();
 
@@ -52,7 +62,7 @@ namespace Cognita_Infrastructure.Data
                 await CreateRolesAsync(new[] { adminRole, employeeRole });
                 var companies = GenerateCourses(4);
                 await db.AddRangeAsync(companies);
-                await GenerateEmployeesAsync(30, companies.ToList());
+                await GenerateUsersAsync(30, companies.ToList());
                 await db.SaveChangesAsync();
             } catch (Exception ex) {
 
@@ -184,101 +194,53 @@ namespace Cognita_Infrastructure.Data
             return courses;
         }
 
-        /*private static async Task CreateRolesAsync(string[] roleNames) {
-            foreach (var roleName in roleNames) {
+        private static async Task CreateRolesAsync(string[] roleNames)
+        {
+            foreach (var roleName in roleNames)
+            {
                 if (await roleManager.RoleExistsAsync(roleName)) continue;
-                var role = new IdentityRole { Name = roleName };
-                var result = await roleManager.CreateAsync(role);
+                var Role = new IdentityRole { Name = roleName };
+                var result = await roleManager.CreateAsync(Role);
 
                 if (!result.Succeeded) throw new Exception(string.Join("\n", result.Errors));
             }
-        }*/
+        }
 
-
-
-        /*private static IEnumerable<Course> GenerateActivities(int nrOfActivities) {
-
-            TimeSpan timeSpan = new TimeSpan(7, 0, 0, 0);
-
-            var activityFaker = new Faker<Activity>("sv").Rules((f, a) => {
-                a.Description = f.Lorem.Paragraph(2);
-                a.ActivityName = f.Lorem.Word();
-                a.StartDate = f.Date.Future(1, DateTime.Now);
-                a.EndDate = f.Date.Future(2, DateTime.Now).Subtract();
-                a.EndDate = f.Date.Future(2, DateTime.add);
-
-            });
-
-
-            var faker = new Faker<Course>("sv").Rules((f, c) => {
-                c.CourseName = f.;
-                c.Address = $"{f.Address.StreetAddress()}, {f.Address.City()}";
-                c.Country = f.Address.Country();
-                // c.Employees = GenerateEmployees(f.Random.Int(min: 2, max: 10));
-            });
-
-            faker.Internet.
-
-
-            return faker.Generate(nrOfActivities);
-        }*/
-
-        /*private static IEnumerable<Course> GenerateCourses(int nrOfCourses) {
-
-            var activityFaker = new Faker<Activity>("sv").Rules((f, a) => {
-                a.Description = f.Lorem.Paragraph(2);
-                a.ActivityName = f.Lorem.Word();
-                a.StartDate = f.Date.Future(1, DateTime.Now);
-                a.EndDate = f.Date.Future(2, DateTime.Now);
-
-
-                //public DateTime StartDate { get; set; }
-                //public DateTime EndDate { get; set; }
-                // c.Employees = GenerateEmployees(f.Random.Int(min: 2, max: 10));
-            });
-
-
-            var faker = new Faker<Course>("sv").Rules((f, c) => {
-                c.CourseName = f.;
-                c.Address = $"{f.Address.StreetAddress()}, {f.Address.City()}";
-                c.Country = f.Address.Country();
-                // c.Employees = GenerateEmployees(f.Random.Int(min: 2, max: 10));
-            });
-
-            faker.Internet.
-
-
-            return faker.Generate(nrOfCompanies);
-        }*/
-
-        /*private static async Task GenerateEmployeesAsync(int nrOfEmplyees, List<Company> companies) {
-            string[] positions = ["Developer", "Tester", "Manager"];
-
+        private static async Task GenerateUsersAsync(int numberOfUsers, IEnumerable<Course> courses) {
             var faker = new Faker<ApplicationUser>("sv").Rules((f, e) => {
-                e.Name = f.Person.FullName;
-                e.Age = f.Random.Int(min: 18, max: 70);
-                e.Position = positions[f.Random.Int(0, positions.Length - 1)];
                 e.Email = f.Person.Email;
                 e.UserName = f.Person.UserName;
-                e.Company = companies[f.Random.Int(0, companies.Count - 1)];
+                e.User = new User()
+                {
+                    Name = f.Person.FullName,
+                    Role = UserRole.Student,
+                    Course = f.PickRandom(courses)
+                };
             });
 
-            var users = faker.Generate(nrOfEmplyees);
+            var users = faker.Generate(numberOfUsers);
+
+            var numberOfTeachers = Math.Ceiling((double)users.Count / 5);
+
+            for (int i = 0; i < numberOfTeachers; i++) {
+                users[i].User.Role = UserRole.Teacher;
+            }
 
             var passWord = configuration["password"];
             if (string.IsNullOrEmpty(passWord))
                 throw new Exception("password not exist in config");
 
-            foreach (var user in users) {
+            foreach (var user in users)
+            {
                 var result = await userManager.CreateAsync(user, passWord);
                 if (!result.Succeeded) throw new Exception(string.Join("\n", result.Errors));
 
-                if (user.Position == "Manager") {
-                    await userManager.AddToRoleAsync(user, adminRole);
+                if (user.User.Role == UserRole.Teacher) {
+                    await userManager.AddToRoleAsync(user, "admin");
                 } else {
-                    await userManager.AddToRoleAsync(user, employeeRole);
+                    await userManager.AddToRoleAsync(user, "regular");
                 }
             }
-        }*/
+        }
     }
 }

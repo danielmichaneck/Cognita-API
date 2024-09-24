@@ -5,6 +5,7 @@ using System.Text;
 using Cognita.API.Service.Contracts;
 using Cognita_Infrastructure.Models.Dtos;
 using Cognita_Infrastructure.Models.Entities;
+using Cognita_Shared.Enums;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.IdentityModel.Tokens;
 
@@ -107,7 +108,8 @@ public class AuthService : IAuthService
             User = new Cognita_Shared.Entities.User
             {
                 CourseId = userForRegistration.CourseId,
-                Name = userForRegistration.Name
+                Name = userForRegistration.Name,
+                Role = UserRole.Student
             }
         };
 
