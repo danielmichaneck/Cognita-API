@@ -230,8 +230,7 @@ namespace Cognita_Infrastructure.Data
             if (string.IsNullOrEmpty(passWord))
                 throw new Exception("password not exist in config");
 
-            foreach (var user in users)
-            {
+            foreach (var user in users) {
                 var result = await userManager.CreateAsync(user, passWord);
                 if (!result.Succeeded) throw new Exception(string.Join("\n", result.Errors));
 

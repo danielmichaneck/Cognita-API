@@ -13,9 +13,9 @@ namespace Cognita.API.Services;
 
 public class AuthService : IAuthService
 {
-    private readonly UserManager<ApplicationUser> userManager;
-    private readonly IConfiguration configuration;
-    private ApplicationUser? user;
+    private readonly UserManager<ApplicationUser> _userManager;
+    private readonly IConfiguration _configuration;
+    private ApplicationUser? _user;
 
     public AuthService(
         UserManager<ApplicationUser> userManager,
@@ -23,8 +23,8 @@ public class AuthService : IAuthService
         IConfiguration configuration
     )
     {
-        this.userManager = userManager;
-        this.configuration = configuration;
+        _userManager = userManager;
+        _configuration = configuration;
     }
 
     public async Task<TokenDto> CreateTokenAsync(bool expireTime)
@@ -33,17 +33,17 @@ public class AuthService : IAuthService
         IEnumerable<Claim> claims = GetClaims();
         JwtSecurityToken tokenOptions = GenerateTokenOptions(signing, claims);
 
-        ArgumentNullException.ThrowIfNull(user, nameof(user));
+        ArgumentNullException.ThrowIfNull(_user, nameof(_user));
 
-        user.RefreshToken = GenerateRefreshToken();
+        _user.RefreshToken = GenerateRefreshToken();
 
         if (expireTime)
-            user.RefreshTokenExpireTime = DateTime.UtcNow.AddDays(2);
+            _user.RefreshTokenExpireTime = DateTime.UtcNow.AddDays(2);
 
-        var res = await userManager.UpdateAsync(user); //ToDo validate res!
+        var res = await _userManager.UpdateAsync(_user); //ToDo validate res!
         string accessToken = new JwtSecurityTokenHandler().WriteToken(tokenOptions);
 
-        return new TokenDto(accessToken, user.RefreshToken);
+        return new TokenDto(accessToken, _user.RefreshToken);
     }
 
     private string GenerateRefreshToken()
@@ -59,7 +59,7 @@ public class AuthService : IAuthService
         IEnumerable<Claim> claims
     )
     {
-        var jwtSettings = configuration.GetSection("JwtSettings");
+        var jwtSettings = _configuration.GetSection("JwtSettings");
 
         var tokenOptions = new JwtSecurityToken(
             issuer: jwtSettings["Issuer"],
@@ -74,12 +74,12 @@ public class AuthService : IAuthService
 
     private IEnumerable<Claim> GetClaims()
     {
-        ArgumentNullException.ThrowIfNull(user);
+        ArgumentNullException.ThrowIfNull(_user);
 
         var claims = new List<Claim>()
         {
-            new Claim(ClaimTypes.Name, user.UserName!),
-            new Claim(ClaimTypes.NameIdentifier, user.Id!)
+            new Claim(ClaimTypes.Name, _user.UserName!),
+            new Claim(ClaimTypes.NameIdentifier, _user.Id!)
             //Add more if needed
         };
 
@@ -88,7 +88,7 @@ public class AuthService : IAuthService
 
     private SigningCredentials GetSigningCredentials()
     {
-        string? secretKey = configuration["secretkey"];
+        string? secretKey = _configuration["secretkey"];
         ArgumentNullException.ThrowIfNull(secretKey, nameof(secretKey));
 
         byte[] key = Encoding.UTF8.GetBytes(secretKey);
@@ -112,7 +112,7 @@ public class AuthService : IAuthService
             }
         };
 
-        IdentityResult result = await userManager.CreateAsync(user, userForRegistration.Password!);
+        IdentityResult result = await _userManager.CreateAsync(user, userForRegistration.Password!);
 
         return result;
     }
@@ -121,16 +121,16 @@ public class AuthService : IAuthService
     {
         ArgumentNullException.ThrowIfNull(userDto, nameof(userDto));
 
-        user = await userManager.FindByNameAsync(userDto.UserName!);
+        _user = await _userManager.FindByNameAsync(userDto.UserName!);
 
-        return user != null && await userManager.CheckPasswordAsync(user, userDto.Password!);
+        return _user != null && await _userManager.CheckPasswordAsync(_user, userDto.Password!);
     }
 
     public async Task<TokenDto> RefreshTokenAsync(TokenDto token)
     {
         ClaimsPrincipal principal = GetPrincipalFromExpiredToken(token.AccessToken);
 
-        ApplicationUser? user = await userManager.FindByNameAsync(principal.Identity?.Name!);
+        ApplicationUser? user = await _userManager.FindByNameAsync(principal.Identity?.Name!);
         if (
             user == null
             || user.RefreshToken != token.RefreshToken
@@ -139,16 +139,16 @@ public class AuthService : IAuthService
             //ToDo: Handle with middleware and custom exception class
             throw new ArgumentException("The TokenDto has som invalid values");
 
-        this.user = user;
+        this._user = user;
 
         return await CreateTokenAsync(expireTime: false);
     }
 
     private ClaimsPrincipal GetPrincipalFromExpiredToken(string accessToken)
     {
-        IConfigurationSection jwtSettings = configuration.GetSection("JwtSettings");
+        IConfigurationSection jwtSettings = _configuration.GetSection("JwtSettings");
 
-        string? secretKey = configuration["secretkey"];
+        string? secretKey = _configuration["secretkey"];
         ArgumentNullException.ThrowIfNull(nameof(secretKey));
 
         TokenValidationParameters tokenValidationParameters =
