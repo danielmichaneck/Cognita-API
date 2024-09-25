@@ -21,8 +21,8 @@ namespace Cognita_Infrastructure.Data
         private static UserManager<ApplicationUser> userManager = null!;
         private static RoleManager<IdentityRole> roleManager = null!;
         private static IConfiguration configuration = null!;
-        private const string userRole = "User";
         private const string adminRole = "Admin";
+        private const string userRole = "User";
 
         public static async Task InitAsync(IServiceProvider serviceProvider)
         {
@@ -51,7 +51,7 @@ namespace Cognita_Infrastructure.Data
 
             await context.SaveChangesAsync();
 
-            await CreateRolesAsync(new[] { "admin", "regular" });
+            await CreateRolesAsync(new[] { adminRole, userRole });
             await GenerateUsersAsync(100, courses);
 
             //Null check on services!
@@ -212,7 +212,7 @@ namespace Cognita_Infrastructure.Data
                 e.UserName = f.Person.UserName;
                 e.User = new User()
                 {
-                    Name = f.Person.FullName,
+                    Name = f.Person.Email,
                     Role = UserRole.Student,
                     Course = f.PickRandom(courses)
                 };
