@@ -42,10 +42,10 @@ namespace Cognita_API
                     new OpenApiSecurityScheme {
                         Reference = new OpenApiReference {
                             Type = ReferenceType.SecurityScheme,
-                                Id = "Bearer"
+                            Id = "Bearer"
                         }
-                },
-                new string[] {}
+                    },
+                    new string[] {}
                 }});
 
             });
@@ -54,8 +54,7 @@ namespace Cognita_API
             );
 
             builder
-                .Services.AddIdentityCore<ApplicationUser>(opt =>
-                {
+                .Services.AddIdentityCore<ApplicationUser>(opt => {
                     opt.Password.RequireDigit = false;
                     opt.Password.RequireLowercase = false;
                     opt.Password.RequireUppercase = false;
@@ -71,8 +70,7 @@ namespace Cognita_API
                 options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
                 options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
                 options.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
-            }).AddJwtBearer("Cognita Scheme",o =>
-            {
+            }).AddJwtBearer("Cognita Scheme",o => {
                 o.RequireHttpsMetadata = true;
                 o.SaveToken = true;
                 o.TokenValidationParameters = new TokenValidationParameters {
@@ -96,8 +94,7 @@ namespace Cognita_API
             var app = builder.Build();
 
             // Configure the HTTP request pipeline.
-            if (app.Environment.IsDevelopment())
-            {
+            if (app.Environment.IsDevelopment()) {
                 app.UseSwagger();
                 app.UseSwaggerUI();
                 await app.SeedDataAsync();
