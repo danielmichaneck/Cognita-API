@@ -10,11 +10,14 @@ namespace Cognita_API.Controllers;
 
 [Route("api/authentication")]
 [ApiController]
-public class AutenticationController : ControllerBase
+public class AuthenticationController : ControllerBase
 {
     private readonly IServiceManager _serviceManager;
+    public const long STANDARD_REFRESH_TOKEN_EXPIRE_TIME_MS = 86400000; // One Day
+    public const long STANDARD_ACCESS_TOKEN_EXPIRE_TIME_MS = 3600000; // One Hour
 
-    public AutenticationController(IServiceManager serviceManager)
+
+    public AuthenticationController(IServiceManager serviceManager)
     {
         _serviceManager = serviceManager;
     }
@@ -53,7 +56,38 @@ public class AutenticationController : ControllerBase
         if (!await _serviceManager.AuthService.ValidateUserAsync(user))
             return Unauthorized();
 
-        TokenDto tokenDto = await _serviceManager.AuthService.CreateTokenAsync(expireTime: true);
+        TokenDto tokenDto = await _serviceManager.AuthService.CreateTokenAsync(STANDARD_REFRESH_TOKEN_EXPIRE_TIME_MS, 
+            STANDARD_ACCESS_TOKEN_EXPIRE_TIME_MS);
         return Ok(tokenDto);
+    }
+
+    [HttpPost("refresh")]
+    [AllowAnonymous]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [SwaggerOperation(
+            Summary = "User refresh access token",
+            Description = "Allows a user to refresh their access token",
+            OperationId = "Refresh"
+        )]
+    [SwaggerResponse(StatusCodes.Status200OK, "Access token refreshed")]
+    [SwaggerResponse(StatusCodes.Status400BadRequest, "The access token could not be refreshed")]
+    public async Task<IActionResult> Refresh(TokenDto currentToken) {
+
+        try {
+            TokenDto tokenDto = await _serviceManager.AuthService.RefreshTokenAsync(currentToken);
+            return Ok(tokenDto);
+            //Return
+        } catch (Exception) {
+            return BadRequest();
+        }
+        
+        
+
+        /*if (!await _serviceManager.AuthService.ValidateUserAsync(user))
+            return Unauthorized();
+
+        TokenDto tokenDto = await _serviceManager.AuthService.CreateTokenAsync(expires: true);
+        return Ok(tokenDto);*/
     }
 }

@@ -3,6 +3,7 @@ using System.Security.Claims;
 using System.Security.Cryptography;
 using System.Text;
 using Cognita.API.Service.Contracts;
+using Cognita_API.Controllers;
 using Cognita_Infrastructure.Models.Dtos;
 using Cognita_Infrastructure.Models.Entities;
 using Cognita_Shared.Enums;
@@ -19,7 +20,7 @@ public class AuthService : IAuthService
 
     public AuthService(
         UserManager<ApplicationUser> userManager,
-        RoleManager<IdentityRole> roleManager,
+        //RoleManager<IdentityRole> roleManager,
         IConfiguration configuration
     )
     {
@@ -27,20 +28,29 @@ public class AuthService : IAuthService
         _configuration = configuration;
     }
 
-    public async Task<TokenDto> CreateTokenAsync(bool expireTime)
+    /// <summary>
+    /// Creates a new TokenDto, a tuple of an access token and a refresh token.
+    /// </summary>
+    /// <param name="refreshTokenExpireTime">Time in milliseconds that a refresh token should be valid for. Should be larger than accessTokenExpireTime.</param>
+    /// <param name="accessTokenExpireTime">Time in milliseconds that an access token should be valid for. Should be smaller than refreshTokenExpireTime.</param>
+    /// <param name="expires">Dictates if the TokenDto should expire or not.</param>
+    /// <returns></returns>
+
+    public async Task<TokenDto> CreateTokenAsync(long refreshTokenExpireTime, long accessTokenExpireTime, bool expires = true)
     {
         SigningCredentials signing = GetSigningCredentials();
         IEnumerable<Claim> claims = GetClaims();
-        JwtSecurityToken tokenOptions = GenerateTokenOptions(signing, claims);
+        JwtSecurityToken tokenOptions = GenerateTokenOptions(signing, claims, accessTokenExpireTime);
 
         ArgumentNullException.ThrowIfNull(_user, nameof(_user));
 
         _user.RefreshToken = GenerateRefreshToken();
 
-        if (expireTime)
-            _user.RefreshTokenExpireTime = DateTime.UtcNow.AddDays(2);
+        if (expires)
+            _user.RefreshTokenExpireTime = DateTime.UtcNow.AddMilliseconds(refreshTokenExpireTime);
 
-        var res = await _userManager.UpdateAsync(_user); //ToDo validate res!
+
+        var res = await _userManager.UpdateAsync(_user); //TODO: Validate res!
         string accessToken = new JwtSecurityTokenHandler().WriteToken(tokenOptions);
 
         return new TokenDto(accessToken, _user.RefreshToken);
@@ -56,7 +66,8 @@ public class AuthService : IAuthService
 
     private JwtSecurityToken GenerateTokenOptions(
         SigningCredentials signing,
-        IEnumerable<Claim> claims
+        IEnumerable<Claim> claims,
+        long  accessTokenExpireTime
     )
     {
         var jwtSettings = _configuration.GetSection("JwtSettings");
@@ -65,7 +76,7 @@ public class AuthService : IAuthService
             issuer: jwtSettings["Issuer"],
             audience: jwtSettings["Audience"],
             claims: claims,
-            expires: DateTime.Now.AddMinutes(Convert.ToDouble(jwtSettings["Expires"])),
+            expires: DateTime.Now.AddMilliseconds(accessTokenExpireTime),
             signingCredentials: signing
         );
 
@@ -141,7 +152,8 @@ public class AuthService : IAuthService
 
         this._user = user;
 
-        return await CreateTokenAsync(expireTime: false);
+        return await CreateTokenAsync(AuthenticationController.STANDARD_REFRESH_TOKEN_EXPIRE_TIME_MS, 
+            AuthenticationController.STANDARD_ACCESS_TOKEN_EXPIRE_TIME_MS);
     }
 
     private ClaimsPrincipal GetPrincipalFromExpiredToken(string accessToken)

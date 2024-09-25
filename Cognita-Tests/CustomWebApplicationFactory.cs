@@ -9,6 +9,7 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace IntegrationTests;
@@ -58,6 +59,14 @@ public class CustomWebApplicationFactory : WebApplicationFactory<Program>
             context.SaveChanges();
             Context = context;
             UserManager = userManager;
+        });
+
+        builder.ConfigureAppConfiguration((context, config) =>
+        {
+            var projectDir = Directory.GetCurrentDirectory();
+            var configPath = Path.Combine(projectDir, "appsettings.tests.json");
+
+            config.AddJsonFile(configPath, optional: false, reloadOnChange: true);
         });
     }
 
