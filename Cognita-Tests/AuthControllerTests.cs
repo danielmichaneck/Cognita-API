@@ -20,30 +20,51 @@ using Cognita_Shared.Enums;
 
 namespace Cognita_Tests
 {
+    // ...
+
     public class AuthControllerTests
-    : IClassFixture<CustomWebApplicationFactory>
+        : IClassFixture<CustomWebApplicationFactory>
     {
         private HttpClient _httpClient;
         private CognitaDbContext _context;
 
         const string baseHttpAddress = "https://localhost:7147/api/";
+        private readonly CustomWebApplicationFactory applicationFactory;
 
         public AuthControllerTests(CustomWebApplicationFactory applicationFactory)
         {
             //applicationFactory.ClientOptions.BaseAddress = new Uri("https://localhost:5000/api/");
             _httpClient = applicationFactory.CreateClient();
             _context = applicationFactory.Context;
+            this.applicationFactory = applicationFactory;
         }
 
         [Fact]
         public async Task LoginTest()
         {
             // Arrange
-            
+            using var scope = applicationFactory.Services.CreateScope();
+            var userManager = scope.ServiceProvider.GetRequiredService<UserManager<ApplicationUser>>();
+
+            var user = new ApplicationUser
+            {
+                UserName = "Kalle",
+                Email = "kalle@example.com",
+                User = new User
+                {
+                    Name = "Kalle",
+                    Role = UserRole.Student,
+                    CourseId = 1
+                }
+            };
+
+            // Act
+            var result = await userManager.CreateAsync(user, "password123");
+
             // Act
             var obj = new UserForAuthenticationDto
             {
-                UserName = "Urban Ek",
+                UserName = "Kalle",
                 Password = "password123",
             };
             var response = await _httpClient.PostAsJsonAsync(baseHttpAddress + "authentication/login", obj);
@@ -59,11 +80,30 @@ namespace Cognita_Tests
         [Fact]
         public async Task CreateUserTest()
         {
+
             // Arrange
+            using var scope = applicationFactory.Services.CreateScope();
+            var userManager = scope.ServiceProvider.GetRequiredService<UserManager<ApplicationUser>>();
+
+            var user = new ApplicationUser
+            {
+                UserName = "Kalle2",
+                Email = "kalle2@example.com",
+                User = new User
+                {
+                    Name = "Kalle2",
+                    Role = UserRole.Student,
+                    CourseId = 1
+                }
+            };
 
             // Act
+            var result = await userManager.CreateAsync(user, "password123");
 
             // Assert
+            Assert.True(result.Succeeded);
+            var createdUser = await userManager.FindByNameAsync("Kalle2");
+            Assert.NotNull(createdUser);
         }
     }
 }
