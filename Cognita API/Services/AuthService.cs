@@ -101,12 +101,11 @@ public class AuthService : IAuthService
     {
         ArgumentNullException.ThrowIfNull(userForRegistration, nameof(userForRegistration));
 
-        var user = new ApplicationUser
-        {
+        var user = new ApplicationUser {
             Email = userForRegistration.Email,
+            UserName = userForRegistration.Name,
 
-            User = new Cognita_Shared.Entities.User
-            {
+            User = new Cognita_Shared.Entities.User {
                 CourseId = userForRegistration.CourseId,
                 Name = userForRegistration.Name,
                 Role = UserRole.Student

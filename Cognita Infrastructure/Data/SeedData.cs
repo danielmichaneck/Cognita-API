@@ -21,8 +21,8 @@ namespace Cognita_Infrastructure.Data
         private static UserManager<ApplicationUser> userManager = null!;
         private static RoleManager<IdentityRole> roleManager = null!;
         private static IConfiguration configuration = null!;
-        /*private const string userRole = "Student";
-        private const string adminRole = "Admin";*/
+        private const string userRole = "User";
+        private const string adminRole = "Admin";
 
         public static async Task InitAsync(IServiceProvider serviceProvider)
         {
@@ -236,9 +236,9 @@ namespace Cognita_Infrastructure.Data
                 if (!result.Succeeded) throw new Exception(string.Join("\n", result.Errors));
 
                 if (user.User.Role == UserRole.Teacher) {
-                    await userManager.AddToRoleAsync(user, "admin");
+                    await userManager.AddToRoleAsync(user, adminRole);
                 } else {
-                    await userManager.AddToRoleAsync(user, "regular");
+                    await userManager.AddToRoleAsync(user, userRole);
                 }
             }
         }
