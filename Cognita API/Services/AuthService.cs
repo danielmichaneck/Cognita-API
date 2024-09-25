@@ -36,18 +36,20 @@ public class AuthService : IAuthService
     /// <param name="expires">Dictates if the TokenDto should expire or not.</param>
     /// <returns></returns>
 
-    public async Task<TokenDto> CreateTokenAsync(long refreshTokenExpireTime, long accessTokenExpireTime, bool expires = true)
+    public async Task<TokenDto> CreateTokenAsync(bool expires = true)
     {
+        var jwtSettings = _configuration.GetSection("JwtSettings");
+
         SigningCredentials signing = GetSigningCredentials();
         IEnumerable<Claim> claims = GetClaims();
-        JwtSecurityToken tokenOptions = GenerateTokenOptions(signing, claims, accessTokenExpireTime);
+        JwtSecurityToken tokenOptions = GenerateTokenOptions(signing, claims, long.Parse(jwtSettings["accessTokenExpirationTime"]));
 
         ArgumentNullException.ThrowIfNull(_user, nameof(_user));
 
         _user.RefreshToken = GenerateRefreshToken();
 
         if (expires)
-            _user.RefreshTokenExpireTime = DateTime.UtcNow.AddMilliseconds(refreshTokenExpireTime);
+            _user.RefreshTokenExpireTime = DateTime.UtcNow.AddMilliseconds(long.Parse(jwtSettings["refreshTokenExpirationTime"]));
 
 
         var res = await _userManager.UpdateAsync(_user); //TODO: Validate res!
@@ -152,8 +154,7 @@ public class AuthService : IAuthService
 
         this._user = user;
 
-        return await CreateTokenAsync(AuthenticationController.STANDARD_REFRESH_TOKEN_EXPIRE_TIME_MS, 
-            AuthenticationController.STANDARD_ACCESS_TOKEN_EXPIRE_TIME_MS);
+        return await CreateTokenAsync();
     }
 
     private ClaimsPrincipal GetPrincipalFromExpiredToken(string accessToken)

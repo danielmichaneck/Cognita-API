@@ -30,4 +30,10 @@
 	  <ProjectReference Include="..\Cognita Domain.Repositories\Cognita-Domain.Repositories.csproj" />
 	</ItemGroup>
 
+  <ItemGroup>
+    <None Update="appsettings.tests.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
 </Project>

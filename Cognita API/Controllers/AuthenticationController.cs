@@ -56,8 +56,7 @@ public class AuthenticationController : ControllerBase
         if (!await _serviceManager.AuthService.ValidateUserAsync(user))
             return Unauthorized();
 
-        TokenDto tokenDto = await _serviceManager.AuthService.CreateTokenAsync(STANDARD_REFRESH_TOKEN_EXPIRE_TIME_MS, 
-            STANDARD_ACCESS_TOKEN_EXPIRE_TIME_MS);
+        TokenDto tokenDto = await _serviceManager.AuthService.CreateTokenAsync();
         return Ok(tokenDto);
     }
 
