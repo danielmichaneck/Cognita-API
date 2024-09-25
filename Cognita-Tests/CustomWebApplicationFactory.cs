@@ -16,7 +16,7 @@ namespace IntegrationTests;
 public class CustomWebApplicationFactory : WebApplicationFactory<Program>
 {
     public CognitaDbContext Context { get; private set; }
-  
+    public UserManager<ApplicationUser> UserManager { get; private set; }
 
     protected override void ConfigureWebHost(IWebHostBuilder builder)
     {
@@ -65,6 +65,7 @@ public class CustomWebApplicationFactory : WebApplicationFactory<Program>
 
             // Set properties for test access
             Context = context;
+            UserManager = userManager;
             
         });
     }

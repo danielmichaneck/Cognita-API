@@ -30,6 +30,7 @@ namespace Cognita_Tests
 
         const string baseHttpAddress = "https://localhost:7147/api/";
         private readonly CustomWebApplicationFactory applicationFactory;
+        private UserManager<ApplicationUser> userManager;
 
         public AuthControllerTests(CustomWebApplicationFactory applicationFactory)
         {
@@ -37,6 +38,7 @@ namespace Cognita_Tests
             _httpClient = applicationFactory.CreateClient();
             _context = applicationFactory.Context;
             this.applicationFactory = applicationFactory;
+            userManager = applicationFactory.UserManager;
         }
 
         [Fact]
@@ -82,8 +84,8 @@ namespace Cognita_Tests
         {
 
             // Arrange
-            using var scope = applicationFactory.Services.CreateScope();
-            var userManager = scope.ServiceProvider.GetRequiredService<UserManager<ApplicationUser>>();
+            //using var scope = applicationFactory.Services.CreateScope();
+            //var userManager = scope.ServiceProvider.GetRequiredService<UserManager<ApplicationUser>>();
 
             var user = new ApplicationUser
             {
@@ -98,6 +100,7 @@ namespace Cognita_Tests
             };
 
             // Act
+           // var result = await userManager.CreateAsync(user, "password123");
             var result = await userManager.CreateAsync(user, "password123");
 
             // Assert
