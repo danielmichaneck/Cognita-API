@@ -15,16 +15,10 @@ namespace IntegrationTests;
 public class CustomWebApplicationFactory : WebApplicationFactory<Program>
 {
     public CognitaDbContext Context { get; private set; }
+    public UserManager<ApplicationUser> UserManager { get; private set; }
 
     protected override void ConfigureWebHost(IWebHostBuilder builder)
     {
-        //base.ConfigureWebHost(builder);
-
-        
-
-        var userManager = base.Services.GetRequiredService<UserManager<ApplicationUser>>();
-        //var userManager = new UserManager<ApplicationUser>();
-
         builder.ConfigureServices(async services => {
             var dbContextOptions = services.SingleOrDefault(
                 d => d.ServiceType == typeof(DbContextOptions<CognitaDbContext>));
@@ -36,43 +30,34 @@ public class CustomWebApplicationFactory : WebApplicationFactory<Program>
                 options.UseInMemoryDatabase("T2");
             });
 
-            var scope = services.BuildServiceProvider().CreateScope();
-            var context = scope.ServiceProvider.GetRequiredService<CognitaDbContext>();
+            var serviceprovider = services.BuildServiceProvider();
+            var scope = serviceprovider.CreateScope();
+            var scopedServices = scope.ServiceProvider;
+            var context = scopedServices.GetRequiredService<CognitaDbContext>();
+            var userManager = scopedServices.GetRequiredService<UserManager<ApplicationUser>>();
 
             context.Course.AddRange([
-                                    new Course() {
-                                        Description = "This is a test course",
-                                        CourseName = "Test course 1"
-                                    }
-                               ]);
+                new Course() {
+                    Description = "This is a test course",
+                    CourseName = "Test course 1"
+                }
+            ]);
 
-            //context.Users.AddRange(
-            //                   [
-            //                        new ApplicationUser() {
-            //                            Email = "urbanek@email.com",
-            //                            UserName = "Urban Ek",
-            //                             User = new User() {
-            //                                 Role = UserRole.Teacher,
-            //                                 Name = "Urban Ek",
-            //                                 CourseId = 1
-            //                             }
-            //                        }
-            //                   ]);
-
-            //await userManager.CreateAsync(
-            //    new ApplicationUser() {
-            //        Email = "urbanek@email.com",
-            //        UserName = "Urban Ek",
-            //        User = new User() {
-            //            Role = UserRole.Teacher,
-            //            Name = "Urban Ek",
-            //            CourseId = 1
-            //        }
-            //    },
-            //    "password123");
+            await userManager.CreateAsync(new ApplicationUser
+            {
+                Email = "urbanek@email.com",
+                UserName = "Urban Ek",
+                User = new User
+                {
+                    Role = UserRole.Teacher,
+                    Name = "Urban Ek",
+                    CourseId = 1
+                }
+            }, "Password123!");
 
             context.SaveChanges();
             Context = context;
+            UserManager = userManager;
         });
     }
 

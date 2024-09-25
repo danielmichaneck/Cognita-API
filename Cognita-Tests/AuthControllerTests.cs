@@ -23,8 +23,10 @@ namespace Cognita_Tests
     public class AuthControllerTests
     : IClassFixture<CustomWebApplicationFactory>
     {
-        private HttpClient _httpClient;
-        private CognitaDbContext _context;
+        private readonly HttpClient _httpClient;
+        private readonly CognitaDbContext _context;
+        private readonly CustomWebApplicationFactory _applicationFactory;
+        private readonly UserManager<ApplicationUser> _userManager;
 
         const string baseHttpAddress = "https://localhost:7147/api/";
 
@@ -33,37 +35,59 @@ namespace Cognita_Tests
             //applicationFactory.ClientOptions.BaseAddress = new Uri("https://localhost:5000/api/");
             _httpClient = applicationFactory.CreateClient();
             _context = applicationFactory.Context;
+            _applicationFactory = applicationFactory;
+            _userManager = applicationFactory.UserManager;
         }
 
         [Fact]
         public async Task LoginTest()
         {
             // Arrange
-            
-            // Act
+            using var scope = _applicationFactory.Services.CreateScope();
+            var userManager = scope.ServiceProvider.GetRequiredService<UserManager<ApplicationUser>>();
+
+            var user = new ApplicationUser
+            {
+                UserName = "Kalle",
+                Email = "kalle@example.com",
+                User = new User
+                {
+                    Name = "Kalle",
+                    Role = UserRole.Student,
+                    CourseId = 1
+                }
+            };
+
+            //Act
+            var result = await userManager.CreateAsync(user, "password123");
+
             var obj = new UserForAuthenticationDto
             {
-                UserName = "Urban Ek",
+                UserName = "Kalle",
                 Password = "password123",
             };
             var response = await _httpClient.PostAsJsonAsync(baseHttpAddress + "authentication/login", obj);
 
             // Assert
-            //response.EnsureSuccessStatusCode(); // Status Code 200-299
-            //Assert.Equal("text/html; charset=utf-8",
-            //    response.Content.Headers.ContentType.ToString());
-
             Assert.True(response.StatusCode == HttpStatusCode.OK);
         }
 
         [Fact]
-        public async Task CreateUserTest()
+        public async Task RegisterUserTest()
         {
             // Arrange
+            var newUser = new UserForRegistrationDto() {
+                Name = "Daniel M",
+                Email = "daniel.m@hemsida.se",
+                Password = "test123",
+                CourseId = 1
+            };
 
             // Act
+            var response = await _httpClient.PostAsJsonAsync(baseHttpAddress + "authentication", newUser);
 
             // Assert
+            Assert.True(response.IsSuccessStatusCode);
         }
     }
 }

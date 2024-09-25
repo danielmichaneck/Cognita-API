@@ -1,6 +1,7 @@
 ﻿using Cognita.API.Service.Contracts;
 using Cognita_Infrastructure.Models.Dtos;
 using Cognita_Shared.Dtos.Course;
+using Cognita_Shared.Dtos.User;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Swashbuckle.AspNetCore.Annotations;
@@ -19,15 +20,15 @@ public class AutenticationController : ControllerBase
     }
 
     [HttpPost]
-    [ProducesResponseType(StatusCodes.Status201Created, Type = typeof(CourseDto))]
+    [ProducesResponseType(StatusCodes.Status201Created)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [SwaggerOperation(
-            Summary = "Creates a user",
-            Description = "Create user with name, password, email, and courseId",
-            OperationId = "CreateUser"
+            Summary = "Registers a user",
+            Description = "Register user with name, password, email, and courseId",
+            OperationId = "RegisterUser"
         )]
-    [SwaggerResponse(StatusCodes.Status201Created, "The user was created succesfully", Type = typeof(CourseDto))]
-    [SwaggerResponse(StatusCodes.Status404NotFound, "The course was not found")]
+    [SwaggerResponse(StatusCodes.Status201Created, "The user was registered successfully")]
+    [SwaggerResponse(StatusCodes.Status400BadRequest, "The user was not registered")]
     public async Task<IActionResult> RegisterUser(UserForRegistrationDto userForRegistration)
     {
         var result = await _serviceManager.AuthService.RegisterUserAsync(userForRegistration);
@@ -38,15 +39,15 @@ public class AutenticationController : ControllerBase
 
     [HttpPost("login")]
     [AllowAnonymous]
-    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(CourseDto))]
+    [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [SwaggerOperation(
-            Summary = "Get a course by id",
-            Description = "Get a course by id",
-            OperationId = "GetCourseById"
+            Summary = "User login",
+            Description = "Allows a user to log in to the app",
+            OperationId = "Login"
         )]
-    [SwaggerResponse(StatusCodes.Status200OK, "The course was found", Type = typeof(CourseDto))]
-    [SwaggerResponse(StatusCodes.Status404NotFound, "The course was not found")]
+    [SwaggerResponse(StatusCodes.Status200OK, "The user was logged in successfully")]
+    [SwaggerResponse(StatusCodes.Status400BadRequest, "The user could not be logged in")]
     public async Task<IActionResult> Authenticate(UserForAuthenticationDto user)
     {
         if (!await _serviceManager.AuthService.ValidateUserAsync(user))
