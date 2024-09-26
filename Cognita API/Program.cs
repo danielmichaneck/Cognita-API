@@ -79,6 +79,7 @@ namespace Cognita_API
                     IssuerSigningKey = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(builder.Configuration["Jwt:Key"])),
                     ValidateIssuer = false,
                     ValidateAudience = false,
+                    ValidateLifetime = true,
                     ClockSkew = TimeSpan.Zero
                 };
             });
