@@ -17,6 +17,8 @@ using Cognita_Infrastructure.Models.Entities;
 using Microsoft.Extensions.DependencyInjection;
 using Cognita_Shared.Entities;
 using Cognita_Shared.Enums;
+using Newtonsoft.Json;
+using System.Net.Http.Headers;
 
 namespace Cognita_Tests
 {
@@ -78,30 +80,118 @@ namespace Cognita_Tests
         }
 
         [Fact]
-        public async Task RefreshTokenTest()
+        public async Task AccessTokenAuthorizationSuccessTest()
         {
             // Arrange
             await SeedTestUser();
 
-            // Act
-            var obj = new UserForAuthenticationDto
-            {
+            var obj = new UserForAuthenticationDto {
                 UserName = "Kalle",
                 Password = "password123",
             };
-            // Tokens
-            var response = await _httpClient.PostAsJsonAsync(baseHttpAddress + "authentication/login", obj);
-
-            // Save tokens
-            //var responseAsString = response.Content.ToString();
 
             // Act
 
-            // Fetch with tokens
-            //var response = await _httpClient.GetAsync("api/courses");
+            // Create and convert token
+            var baseResponse = await _httpClient.PostAsJsonAsync(baseHttpAddress + "authentication/login", obj);
+            var jsonResponse = await baseResponse.Content.ReadAsStringAsync();
+            TokenDto convertedToken = JsonConvert.DeserializeObject<TokenDto>(jsonResponse);
+
+            // Fetch with token
+
+            bool success = false;
+
+            using (var requestMessage = new HttpRequestMessage(HttpMethod.Get, "api/courses")) {
+                requestMessage.Headers.Authorization =
+                    new AuthenticationHeaderValue("Bearer", convertedToken.AccessToken);
+
+                var requestResult = await _httpClient.SendAsync(requestMessage);
+
+                if (requestResult.IsSuccessStatusCode) {
+                    success = true;
+                }
+            }
 
             // Assert
-            Assert.True(response.StatusCode == HttpStatusCode.Unauthorized);
+            Assert.True(success);
+        }
+
+        [Fact]
+        public async Task AccessTokenAuthorizationFailureTest() {
+            // Arrange
+            await SeedTestUser();
+
+            var obj = new UserForAuthenticationDto {
+                UserName = "Kalle",
+                Password = "wrong password",
+            };
+
+            // Act
+
+            // Create and convert token
+            var baseResponse = await _httpClient.PostAsJsonAsync(baseHttpAddress + "authentication/login", obj);
+            var jsonResponse = await baseResponse.Content.ReadAsStringAsync();
+            TokenDto convertedToken = JsonConvert.DeserializeObject<TokenDto>(jsonResponse);
+
+            // Fetch with token
+
+            bool success = false;
+
+            using (var requestMessage = new HttpRequestMessage(HttpMethod.Get, "api/courses")) {
+                requestMessage.Headers.Authorization =
+                    new AuthenticationHeaderValue("Bearer", convertedToken.AccessToken);
+
+                var requestResult = await _httpClient.SendAsync(requestMessage);
+
+                if (requestResult.IsSuccessStatusCode) {
+                    success = true;
+                }
+            }
+
+            // Assert
+            Assert.False(success);
+        }
+
+        [Fact]
+        public async Task AccessTokenAuthorizationExpirationTest() {
+            // Arrange
+            await SeedTestUser();
+
+            var obj = new UserForAuthenticationDto {
+                UserName = "Kalle",
+                Password = "password123",
+            };
+
+            // Act
+
+            // Create and convert token
+            var baseResponse = await _httpClient.PostAsJsonAsync(baseHttpAddress + "authentication/login", obj);
+            var jsonResponse = await baseResponse.Content.ReadAsStringAsync();
+            TokenDto convertedToken = JsonConvert.DeserializeObject<TokenDto>(jsonResponse);
+
+            //Expire the token
+
+            var stuff = await _userManager.FindByNameAsync("Kalle");
+
+            Thread.Sleep(600);
+
+            // Fetch with token
+
+            bool success = false;
+
+            using (var requestMessage = new HttpRequestMessage(HttpMethod.Get, "api/courses")) {
+                requestMessage.Headers.Authorization =
+                    new AuthenticationHeaderValue("Bearer", convertedToken.AccessToken);
+
+                var requestResult = await _httpClient.SendAsync(requestMessage);
+
+                if (requestResult.IsSuccessStatusCode) {
+                    success = true;
+                }
+            }
+
+            // Assert
+            Assert.False(success);
         }
 
         private async Task SeedTestUser() {
@@ -117,6 +207,8 @@ namespace Cognita_Tests
                     CourseId = 1
                 }
             };
+
+            _testUserSeeded = true;
 
             await _userManager.CreateAsync(user, "password123");
         }

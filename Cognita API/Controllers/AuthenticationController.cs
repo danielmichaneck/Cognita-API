@@ -63,7 +63,7 @@ public class AuthenticationController : ControllerBase
     [HttpPost("refresh")]
     [AllowAnonymous]
     [ProducesResponseType(StatusCodes.Status200OK)]
-    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [SwaggerOperation(
             Summary = "User refresh access token",
             Description = "Allows a user to refresh their access token",
