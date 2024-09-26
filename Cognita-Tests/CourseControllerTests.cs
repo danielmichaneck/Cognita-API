@@ -58,5 +58,15 @@ namespace Cognita_Tests
 
             Assert.True(success);
         }
+
+        [Fact]
+        public async Task Get_All_Fail_Unautherized_Test()
+        {
+            // Act
+            var response = await _httpClient.GetAsync("api/courses");
+
+            // Assert
+            Assert.True(response.StatusCode == HttpStatusCode.Unauthorized);
+        }
     }
 }

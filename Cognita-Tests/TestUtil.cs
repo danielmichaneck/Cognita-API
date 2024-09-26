@@ -27,14 +27,18 @@ namespace Cognita_Tests
 
         private bool _userSeeded = false;
 
-        public TestUtil(UserManager<ApplicationUser> userManager, HttpClient httpClient)
-        {
+        public TestUtil(UserManager<ApplicationUser> userManager, HttpClient httpClient) {
             _userManager = userManager;
             _httpClient = httpClient;
         }
 
         private async Task SeedTestUserAsync() {
             if (_userSeeded) return;
+            _userSeeded = true;
+
+            var exists = await _userManager.FindByNameAsync(USER_SEED_EMAIL);
+            if (exists != null) return;
+
             var user = new ApplicationUser {
                 UserName = USER_SEED_EMAIL,
                 Email = USER_SEED_EMAIL,
@@ -44,8 +48,6 @@ namespace Cognita_Tests
                     CourseId = USER_SEED_COURSE_ID
                 }
             };
-
-            _userSeeded = true;
 
             await _userManager.CreateAsync(user, USER_SEED_PASSWORD);
         }
