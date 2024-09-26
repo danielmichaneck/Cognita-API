@@ -27,6 +27,7 @@ namespace Cognita_Tests
         private readonly CognitaDbContext _context;
         private readonly CustomWebApplicationFactory _applicationFactory;
         private readonly UserManager<ApplicationUser> _userManager;
+        private bool _testUserSeeded;
 
         const string baseHttpAddress = "https://localhost:7147/api/";
 
@@ -37,30 +38,16 @@ namespace Cognita_Tests
             _context = applicationFactory.Context;
             _applicationFactory = applicationFactory;
             _userManager = applicationFactory.UserManager;
+            _testUserSeeded = false;
         }
 
         [Fact]
         public async Task LoginTest()
         {
-            // Arrange
-            using var scope = _applicationFactory.Services.CreateScope();
-            var userManager = scope.ServiceProvider.GetRequiredService<UserManager<ApplicationUser>>();
+            // Arrage
+            await SeedTestUser();
 
-            var user = new ApplicationUser
-            {
-                UserName = "Kalle",
-                Email = "kalle@example.com",
-                User = new User
-                {
-                    Name = "Kalle",
-                    Role = UserRole.Student,
-                    CourseId = 1
-                }
-            };
-
-            //Act
-            var result = await userManager.CreateAsync(user, "password123");
-
+            // Act
             var obj = new UserForAuthenticationDto
             {
                 UserName = "Kalle",
@@ -88,6 +75,50 @@ namespace Cognita_Tests
 
             // Assert
             Assert.True(response.IsSuccessStatusCode);
+        }
+
+        [Fact]
+        public async Task RefreshTokenTest()
+        {
+            // Arrange
+            await SeedTestUser();
+
+            // Act
+            var obj = new UserForAuthenticationDto
+            {
+                UserName = "Kalle",
+                Password = "password123",
+            };
+            // Tokens
+            var response = await _httpClient.PostAsJsonAsync(baseHttpAddress + "authentication/login", obj);
+
+            // Save tokens
+            //var responseAsString = response.Content.ToString();
+
+            // Act
+
+            // Fetch with tokens
+            //var response = await _httpClient.GetAsync("api/courses");
+
+            // Assert
+            Assert.True(response.StatusCode == HttpStatusCode.Unauthorized);
+        }
+
+        private async Task SeedTestUser() {
+            if (_testUserSeeded) return;
+            var user = new ApplicationUser
+            {
+                UserName = "Kalle",
+                Email = "kalle@example.com",
+                User = new User
+                {
+                    Name = "Kalle",
+                    Role = UserRole.Student,
+                    CourseId = 1
+                }
+            };
+
+            await _userManager.CreateAsync(user, "password123");
         }
     }
 }
