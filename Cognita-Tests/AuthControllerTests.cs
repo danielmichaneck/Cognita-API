@@ -34,16 +34,16 @@ namespace Cognita_Tests
             _applicationFactory = applicationFactory;
             _userManager = applicationFactory.UserManager;
             _testUserSeeded = false;
-            _util = new TestUtil(_userManager);
+            _util = new TestUtil(_userManager, _httpClient);
         }
 
         [Fact]
         public async Task LoginTest()
         {
-            // Arrage
-            //await SeedTestUser();
-            await _util.SeedTestUserAsync();
-            var testUser = _util.GetTestUserAuthenticationDto();
+            // Arrange
+
+            //await _util.SeedTestUserAsync();
+            var testUser = await _util.GetTestUserAuthenticationDtoAsync();
 
             // Act
 
@@ -75,19 +75,7 @@ namespace Cognita_Tests
         public async Task AccessTokenAuthorizationSuccessTest()
         {
             // Arrange
-            await SeedTestUser();
-
-            var obj = new UserForAuthenticationDto {
-                UserName = "Kalle",
-                Password = "password123",
-            };
-
-            // Act
-
-            // Create and convert token
-            var baseResponse = await _httpClient.PostAsJsonAsync(baseHttpAddress + "authentication/login", obj);
-            var jsonResponse = await baseResponse.Content.ReadAsStringAsync();
-            TokenDto convertedToken = JsonConvert.DeserializeObject<TokenDto>(jsonResponse);
+            var token = await _util.LogInTestUserAsync();
 
             // Fetch with token
 
@@ -95,7 +83,7 @@ namespace Cognita_Tests
 
             using (var requestMessage = new HttpRequestMessage(HttpMethod.Get, "api/courses")) {
                 requestMessage.Headers.Authorization =
-                    new AuthenticationHeaderValue("Bearer", convertedToken.AccessToken);
+                    new AuthenticationHeaderValue("Bearer", token.AccessToken);
 
                 var requestResult = await _httpClient.SendAsync(requestMessage);
 
@@ -111,15 +99,7 @@ namespace Cognita_Tests
         [Fact]
         public async Task AccessTokenAuthorizationFailureTest() {
             // Arrange
-            await SeedTestUser();
-            var testUser = _util.GetTestUserAuthenticationDto();
-
-            // Act
-
-            // Create and convert token
-            var baseResponse = await _httpClient.PostAsJsonAsync(baseHttpAddress + "authentication/login", testUser);
-            var jsonResponse = await baseResponse.Content.ReadAsStringAsync();
-            TokenDto convertedToken = JsonConvert.DeserializeObject<TokenDto>(jsonResponse);
+            var token = await _util.LogInTestUserAsync();
 
             // Fetch with token
 
@@ -127,7 +107,7 @@ namespace Cognita_Tests
 
             using (var requestMessage = new HttpRequestMessage(HttpMethod.Get, "api/courses")) {
                 requestMessage.Headers.Authorization =
-                    new AuthenticationHeaderValue("Bearer", convertedToken.AccessToken);
+                    new AuthenticationHeaderValue("Bearer", token.AccessToken + "a");
 
                 var requestResult = await _httpClient.SendAsync(requestMessage);
 
@@ -143,37 +123,22 @@ namespace Cognita_Tests
         [Fact]
         public async Task AccessTokenAuthorizationExpirationTest() {
             // Arrange
-            await SeedTestUser();
-
-            var obj = new UserForAuthenticationDto {
-                UserName = "Kalle",
-                Password = "password123",
-            };
-
-            // Act
-
-            // Create and convert token
-            var baseResponse = await _httpClient.PostAsJsonAsync(baseHttpAddress + "authentication/login", obj);
-            var jsonResponse = await baseResponse.Content.ReadAsStringAsync();
-            TokenDto convertedToken = JsonConvert.DeserializeObject<TokenDto>(jsonResponse);
+            var token = await _util.LogInTestUserAsync();
 
 
             //Expire the token
 
             //var stuff = await _userManager.FindByNameAsync("Kalle");
 
-            var ttime = GetTokenExpirationTime(convertedToken.AccessToken);
+            var ttime = GetTokenExpirationTime(token.AccessToken);
 
-            var expired = CheckTokenIsValid(convertedToken.AccessToken);
+            var expired = CheckTokenIsValid(token.AccessToken);
 
             Thread.Sleep(2000);
 
-            var ttimeAfter = GetTokenExpirationTime(convertedToken.AccessToken);
+            var ttimeAfter = GetTokenExpirationTime(token.AccessToken);
 
-            var expiredAfterSleep = CheckTokenIsValid(convertedToken.AccessToken);
-
-
-
+            var expiredAfterSleep = CheckTokenIsValid(token.AccessToken);
 
             // Fetch with token
 
@@ -181,7 +146,7 @@ namespace Cognita_Tests
 
             using (var requestMessage = new HttpRequestMessage(HttpMethod.Get, "api/courses")) {
                 requestMessage.Headers.Authorization =
-                    new AuthenticationHeaderValue("Bearer", convertedToken!.AccessToken);
+                    new AuthenticationHeaderValue("Bearer", token.AccessToken);
                 
                 var requestResult = await _httpClient.SendAsync(requestMessage);
 
@@ -198,29 +163,9 @@ namespace Cognita_Tests
         public async Task Token_Should_Expire_As_Expected()
         {
             // Arrange
-            await SeedTestUser();
+            var token = await _util.LogInTestUserAsync();
+            var ttime = GetTokenExpirationTime(token.AccessToken);
 
-            var obj = new UserForAuthenticationDto
-            {
-                UserName = "Kalle",
-                Password = "password123",
-            };
-
-            // Act
-
-            // Create and convert token
-            var baseResponse = await _httpClient.PostAsJsonAsync(baseHttpAddress + "authentication/login", obj);
-            var jsonResponse = await baseResponse.Content.ReadAsStringAsync();
-            TokenDto convertedToken = JsonConvert.DeserializeObject<TokenDto>(jsonResponse);
-
-
-            //Expire the token
-
-            //var stuff = await _userManager.FindByNameAsync("Kalle");
-
-            var ttime = GetTokenExpirationTime(convertedToken.AccessToken);
-
-            // Arrange
             long unixTimestamp = ttime; // Token's expiration time
             DateTimeOffset expirationTimeOffset = DateTimeOffset.FromUnixTimeSeconds(unixTimestamp);
             DateTime expirationTimeUtc = expirationTimeOffset.UtcDateTime;
@@ -233,25 +178,6 @@ namespace Cognita_Tests
 
             // Assert
             Assert.True(isTokenExpired, "Token should be expired.");
-        }
-
-        private async Task SeedTestUser() {
-            if (_testUserSeeded) return;
-            var user = new ApplicationUser
-            {
-                UserName = "Kalle",
-                Email = "kalle@example.com",
-                User = new User
-                {
-                    Name = "Kalle",
-                    Role = UserRole.Student,
-                    CourseId = 1
-                }
-            };
-
-            _testUserSeeded = true;
-
-            await _userManager.CreateAsync(user, "password123");
         }
 
         public static long GetTokenExpirationTime(string token)

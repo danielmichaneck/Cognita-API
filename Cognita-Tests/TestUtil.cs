@@ -3,9 +3,12 @@ using Cognita_Infrastructure.Models.Entities;
 using Cognita_Shared.Entities;
 using Cognita_Shared.Enums;
 using Microsoft.AspNetCore.Identity;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net.Http;
+using System.Net.Http.Json;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -20,14 +23,17 @@ namespace Cognita_Tests
         private const UserRole USER_SEED_ROLE = UserRole.Student;
 
         private readonly UserManager<ApplicationUser> _userManager;
+        private readonly HttpClient _httpClient;
+
         private bool _userSeeded = false;
 
-        public TestUtil(UserManager<ApplicationUser> userManager)
+        public TestUtil(UserManager<ApplicationUser> userManager, HttpClient httpClient)
         {
             _userManager = userManager;
+            _httpClient = httpClient;
         }
 
-        internal async Task SeedTestUserAsync() {
+        private async Task SeedTestUserAsync() {
             if (_userSeeded) return;
             var user = new ApplicationUser {
                 UserName = USER_SEED_EMAIL,
@@ -44,11 +50,19 @@ namespace Cognita_Tests
             await _userManager.CreateAsync(user, USER_SEED_PASSWORD);
         }
 
-        internal UserForAuthenticationDto GetTestUserAuthenticationDto() {
+        internal async Task<UserForAuthenticationDto> GetTestUserAuthenticationDtoAsync() {
+            await SeedTestUserAsync();
             return new UserForAuthenticationDto() {
                 UserName = USER_SEED_EMAIL,
                 Password = USER_SEED_PASSWORD
             };
+        }
+
+        internal async Task<TokenDto> LogInTestUserAsync() {
+            await SeedTestUserAsync();
+            var baseResponse = await _httpClient.PostAsJsonAsync("api/authentication/login", await GetTestUserAuthenticationDtoAsync());
+            var jsonResponse = await baseResponse.Content.ReadAsStringAsync();
+            return JsonConvert.DeserializeObject<TokenDto>(jsonResponse);
         }
     }
 }
