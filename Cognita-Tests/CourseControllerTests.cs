@@ -7,11 +7,13 @@ using Cognita_Infrastructure.Models.Entities;
 using IntegrationTests;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc.Testing;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System.Net;
 using System.Net.Http.Headers;
 
 namespace Cognita_Tests
 {
+    [DoNotParallelize]
     public class CourseControllerTests
     : IClassFixture<CustomWebApplicationFactory>
     {
@@ -23,7 +25,6 @@ namespace Cognita_Tests
         const string baseHttpAddress = "https://localhost:7147/api/";
 
         public CourseControllerTests(CustomWebApplicationFactory applicationFactory) {
-            //applicationFactory.ClientOptions.BaseAddress = new Uri("https://localhost:5000/api/");
             _httpClient = applicationFactory.CreateClient();
             _context = applicationFactory.Context;
             _userManager = applicationFactory.UserManager;
@@ -34,9 +35,7 @@ namespace Cognita_Tests
         public async Task GetAllTest_Success() {
             // Arrange
 
-            //await _util.SeedTestUserAsync();
             TokenDto token = await _util.LogInTestUserAsync();
-
             bool success = false;
 
             // Act
@@ -56,7 +55,7 @@ namespace Cognita_Tests
 
             // Assert
 
-            Assert.True(success);
+            Xunit.Assert.True(success);
         }
 
         [Fact]
@@ -66,7 +65,7 @@ namespace Cognita_Tests
             var response = await _httpClient.GetAsync("api/courses");
 
             // Assert
-            Assert.True(response.StatusCode == HttpStatusCode.Unauthorized);
+            Xunit.Assert.True(response.StatusCode == HttpStatusCode.Unauthorized);
         }
     }
 }

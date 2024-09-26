@@ -32,6 +32,10 @@ namespace Cognita_Tests
             _httpClient = httpClient;
         }
 
+        /// <summary>
+        /// Seeds test user based on constant if one does not exist.
+        /// </summary>
+        /// <returns></returns>
         private async Task SeedTestUserAsync() {
             if (_userSeeded) return;
             _userSeeded = true;
@@ -49,9 +53,18 @@ namespace Cognita_Tests
                 }
             };
 
-            await _userManager.CreateAsync(user, USER_SEED_PASSWORD);
+            try {
+                await _userManager.CreateAsync(user, USER_SEED_PASSWORD);
+            }
+            catch (Exception ex) {
+                return;
+            }
         }
 
+        /// <summary>
+        /// Returns a dto for logging in a test user.
+        /// </summary>
+        /// <returns></returns>
         internal async Task<UserForAuthenticationDto> GetTestUserAuthenticationDtoAsync() {
             await SeedTestUserAsync();
             return new UserForAuthenticationDto() {
@@ -60,6 +73,10 @@ namespace Cognita_Tests
             };
         }
 
+        /// <summary>
+        /// Gets a Token for a logged in test user.
+        /// </summary>
+        /// <returns></returns>
         internal async Task<TokenDto> LogInTestUserAsync() {
             await SeedTestUserAsync();
             var baseResponse = await _httpClient.PostAsJsonAsync("api/authentication/login", await GetTestUserAuthenticationDtoAsync());
