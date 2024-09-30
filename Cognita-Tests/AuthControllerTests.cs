@@ -15,7 +15,7 @@ namespace Cognita_Tests
 {
     [Collection("DbCollection")]
     public class AuthControllerTests
-    : IClassFixture<CustomWebApplicationFactory>
+    //: IClassFixture<CustomWebApplicationFactory>
     {
         private readonly HttpClient _httpClient;
         private readonly CognitaDbContext _context;

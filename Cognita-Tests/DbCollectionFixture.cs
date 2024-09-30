@@ -6,10 +6,11 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Cognita_Tests
+
+namespace Cognita_Tests;
+
+[CollectionDefinition("DbCollection", DisableParallelization = true)]
+public class DbCollectionFixture : ICollectionFixture<CustomWebApplicationFactory>
 {
-    [CollectionDefinition("DbCollection", DisableParallelization = true)]
-    public class DbCollectionFixture : ICollectionFixture<CustomWebApplicationFactory>
-    {
-    }
+}
 }
