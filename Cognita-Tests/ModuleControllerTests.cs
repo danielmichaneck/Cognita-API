@@ -1,4 +1,4 @@
-using Cognita_API.Infrastructure.Data;
+﻿using Cognita_API.Infrastructure.Data;
 using Cognita_Infrastructure.Models.Dtos;
 using Cognita_Infrastructure.Models.Entities;
 using IntegrationTests;
@@ -10,8 +10,8 @@ namespace Cognita_Tests
 {
     //[DoNotParallelize]
     [Collection("DbCollection")]
-    public class CourseControllerTests
-  //  : IClassFixture<CustomWebApplicationFactory>
+    public class ModuleControllerTests
+    //  : IClassFixture<CustomWebApplicationFactory>
     {
         private HttpClient _httpClient;
         private CognitaDbContext _context;
@@ -20,7 +20,8 @@ namespace Cognita_Tests
 
         const string baseHttpAddress = "https://localhost:7147/api/";
 
-        public CourseControllerTests(CustomWebApplicationFactory applicationFactory) {
+        public ModuleControllerTests(CustomWebApplicationFactory applicationFactory)
+        {
             _httpClient = applicationFactory.CreateClient();
             _context = applicationFactory.Context;
             _userManager = applicationFactory.UserManager;
@@ -28,7 +29,8 @@ namespace Cognita_Tests
         }
 
         [Fact]
-        public async Task GetAllTest_Success() {
+        public async Task GetAllModules_Test()
+        {
             // Arrange
 
             TokenDto token = await _util.LogInTestUserAsync();
@@ -36,7 +38,7 @@ namespace Cognita_Tests
 
             // Act
 
-            using (var requestMessage = new HttpRequestMessage(HttpMethod.Get, "api/courses"))
+            using (var requestMessage = new HttpRequestMessage(HttpMethod.Get, "api/courses/1/modules"))
             {
                 requestMessage.Headers.Authorization =
                     new AuthenticationHeaderValue("Bearer", token.AccessToken);
@@ -52,16 +54,6 @@ namespace Cognita_Tests
             // Assert
 
             Assert.True(success);
-        }
-
-        [Fact]
-        public async Task Get_All_Fail_Unautherized_Test()
-        {
-            // Act
-            var response = await _httpClient.GetAsync("api/courses");
-
-            // Assert
-            Assert.True(response.StatusCode == HttpStatusCode.Unauthorized);
         }
     }
 }

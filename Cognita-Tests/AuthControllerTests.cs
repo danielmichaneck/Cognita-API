@@ -5,9 +5,6 @@ using System.Net;
 using Cognita_Infrastructure.Models.Dtos;
 using Microsoft.AspNetCore.Identity;
 using Cognita_Infrastructure.Models.Entities;
-using Cognita_Shared.Entities;
-using Cognita_Shared.Enums;
-using Newtonsoft.Json;
 using System.Net.Http.Headers;
 using System.IdentityModel.Tokens.Jwt;
 
@@ -50,7 +47,7 @@ namespace Cognita_Tests
 
             // Assert
 
-            Xunit.Assert.True(response.StatusCode == HttpStatusCode.OK);
+            Assert.True(response.StatusCode == HttpStatusCode.OK);
         }
 
         [Fact]
@@ -71,7 +68,7 @@ namespace Cognita_Tests
 
             // Assert
 
-            Xunit.Assert.True(response.IsSuccessStatusCode);
+            Assert.True(response.IsSuccessStatusCode);
         }
 
         [Fact]
@@ -97,7 +94,7 @@ namespace Cognita_Tests
             }
 
             // Assert
-            Xunit.Assert.True(success);
+            Assert.True(success);
         }
 
         [Fact]
@@ -123,7 +120,7 @@ namespace Cognita_Tests
 
             // Assert
 
-            Xunit.Assert.False(success);
+            Assert.False(success);
         }
 
         [Fact]
@@ -162,7 +159,7 @@ namespace Cognita_Tests
 
             // Assert
 
-            Xunit.Assert.False(success);
+            Assert.False(success);
         }
 
         [Fact]
@@ -186,7 +183,7 @@ namespace Cognita_Tests
 
             // Assert
 
-            Xunit.Assert.True(isTokenExpired, "Token should be expired.");
+            Assert.True(isTokenExpired, "Token should be expired.");
         }
 
         // Straight up Stack Overflow

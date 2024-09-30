@@ -13,4 +13,3 @@ namespace Cognita_Tests;
 public class DbCollectionFixture : ICollectionFixture<CustomWebApplicationFactory>
 {
 }
-}
