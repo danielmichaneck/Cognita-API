@@ -46,7 +46,7 @@ public class CustomWebApplicationFactory : WebApplicationFactory<Program>
             await userManager.CreateAsync(new ApplicationUser
             {
                 Email = "urbanek@email.com",
-                UserName = "Urban Ek",
+                UserName = "urbanek@email.com",
                 User = new User
                 {
                     Role = UserRole.Teacher,
