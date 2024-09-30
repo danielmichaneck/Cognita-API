@@ -14,9 +14,9 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace Cognita_Tests
 {
-    [DoNotParallelize]
+    [Collection("DbCollection")]
     public class AuthControllerTests
-    : IClassFixture<CustomWebApplicationFactory>
+    //: IClassFixture<CustomWebApplicationFactory>
     {
         private readonly HttpClient _httpClient;
         private readonly CognitaDbContext _context;
