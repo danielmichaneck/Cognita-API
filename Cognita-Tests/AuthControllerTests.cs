@@ -10,17 +10,15 @@ using System.IdentityModel.Tokens.Jwt;
 
 namespace Cognita_Tests
 {
+    //[DoNotParallelize]
     [Collection("DbCollection")]
     public class AuthControllerTests
-    //: IClassFixture<CustomWebApplicationFactory>
     {
         private readonly HttpClient _httpClient;
         private readonly CognitaDbContext _context;
-        private readonly CustomWebApplicationFactory _applicationFactory;
         private readonly UserManager<ApplicationUser> _userManager;
 
-        private TestUtil _util;
-        private bool _testUserSeeded;
+        private readonly TestUtil _util;
 
         const string baseHttpAddress = "https://localhost:7147/api/";
 
@@ -28,9 +26,7 @@ namespace Cognita_Tests
         {
             _httpClient = applicationFactory.CreateClient();
             _context = applicationFactory.Context;
-            _applicationFactory = applicationFactory;
             _userManager = applicationFactory.UserManager;
-            _testUserSeeded = false;
             _util = new TestUtil(_userManager, _httpClient);
         }
 

@@ -11,7 +11,6 @@ namespace Cognita_Tests
     //[DoNotParallelize]
     [Collection("DbCollection")]
     public class ModuleControllerTests
-    //  : IClassFixture<CustomWebApplicationFactory>
     {
         private HttpClient _httpClient;
         private CognitaDbContext _context;

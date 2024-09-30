@@ -13,9 +13,6 @@ namespace Cognita_API.Controllers;
 public class AuthenticationController : ControllerBase
 {
     private readonly IServiceManager _serviceManager;
-    public const long STANDARD_REFRESH_TOKEN_EXPIRE_TIME_MS = 86400000; // One Day
-    public const long STANDARD_ACCESS_TOKEN_EXPIRE_TIME_MS = 3600000; // One Hour
-
 
     public AuthenticationController(IServiceManager serviceManager)
     {
@@ -80,13 +77,5 @@ public class AuthenticationController : ControllerBase
         } catch (Exception) {
             return BadRequest();
         }
-        
-        
-
-        /*if (!await _serviceManager.AuthService.ValidateUserAsync(user))
-            return Unauthorized();
-
-        TokenDto tokenDto = await _serviceManager.AuthService.CreateTokenAsync(expires: true);
-        return Ok(tokenDto);*/
     }
 }
