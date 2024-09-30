@@ -27,14 +27,22 @@ namespace Cognita_Tests
 
         private bool _userSeeded = false;
 
-        public TestUtil(UserManager<ApplicationUser> userManager, HttpClient httpClient)
-        {
+        public TestUtil(UserManager<ApplicationUser> userManager, HttpClient httpClient) {
             _userManager = userManager;
             _httpClient = httpClient;
         }
 
+        /// <summary>
+        /// Seeds test user based on constant if one does not exist.
+        /// </summary>
+        /// <returns></returns>
         private async Task SeedTestUserAsync() {
             if (_userSeeded) return;
+            _userSeeded = true;
+
+            var exists = await _userManager.FindByNameAsync(USER_SEED_EMAIL);
+            if (exists != null) return;
+
             var user = new ApplicationUser {
                 UserName = USER_SEED_EMAIL,
                 Email = USER_SEED_EMAIL,
@@ -45,11 +53,18 @@ namespace Cognita_Tests
                 }
             };
 
-            _userSeeded = true;
-
-            await _userManager.CreateAsync(user, USER_SEED_PASSWORD);
+            try {
+                await _userManager.CreateAsync(user, USER_SEED_PASSWORD);
+            }
+            catch (Exception ex) {
+                return;
+            }
         }
 
+        /// <summary>
+        /// Returns a dto for logging in a test user.
+        /// </summary>
+        /// <returns></returns>
         internal async Task<UserForAuthenticationDto> GetTestUserAuthenticationDtoAsync() {
             await SeedTestUserAsync();
             return new UserForAuthenticationDto() {
@@ -58,6 +73,10 @@ namespace Cognita_Tests
             };
         }
 
+        /// <summary>
+        /// Gets a Token for a logged in test user.
+        /// </summary>
+        /// <returns></returns>
         internal async Task<TokenDto> LogInTestUserAsync() {
             await SeedTestUserAsync();
             var baseResponse = await _httpClient.PostAsJsonAsync("api/authentication/login", await GetTestUserAuthenticationDtoAsync());

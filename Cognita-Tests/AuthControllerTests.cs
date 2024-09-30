@@ -10,9 +10,11 @@ using Cognita_Shared.Enums;
 using Newtonsoft.Json;
 using System.Net.Http.Headers;
 using System.IdentityModel.Tokens.Jwt;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace Cognita_Tests
 {
+    [DoNotParallelize]
     public class AuthControllerTests
     : IClassFixture<CustomWebApplicationFactory>
     {
@@ -28,7 +30,6 @@ namespace Cognita_Tests
 
         public AuthControllerTests(CustomWebApplicationFactory applicationFactory)
         {
-            //applicationFactory.ClientOptions.BaseAddress = new Uri("https://localhost:5000/api/");
             _httpClient = applicationFactory.CreateClient();
             _context = applicationFactory.Context;
             _applicationFactory = applicationFactory;
@@ -42,7 +43,6 @@ namespace Cognita_Tests
         {
             // Arrange
 
-            //await _util.SeedTestUserAsync();
             var testUser = await _util.GetTestUserAuthenticationDtoAsync();
 
             // Act
@@ -50,13 +50,15 @@ namespace Cognita_Tests
             var response = await _httpClient.PostAsJsonAsync(baseHttpAddress + "authentication/login", testUser);
 
             // Assert
-            Assert.True(response.StatusCode == HttpStatusCode.OK);
+
+            Xunit.Assert.True(response.StatusCode == HttpStatusCode.OK);
         }
 
         [Fact]
         public async Task RegisterUserTest()
         {
             // Arrange
+
             var newUser = new UserForRegistrationDto() {
                 Name = "Daniel M",
                 Email = "daniel.m@hemsida.se",
@@ -65,16 +67,19 @@ namespace Cognita_Tests
             };
 
             // Act
+
             var response = await _httpClient.PostAsJsonAsync(baseHttpAddress + "authentication", newUser);
 
             // Assert
-            Assert.True(response.IsSuccessStatusCode);
+
+            Xunit.Assert.True(response.IsSuccessStatusCode);
         }
 
         [Fact]
         public async Task AccessTokenAuthorizationSuccessTest()
         {
             // Arrange
+
             var token = await _util.LogInTestUserAsync();
 
             // Fetch with token
@@ -93,12 +98,13 @@ namespace Cognita_Tests
             }
 
             // Assert
-            Assert.True(success);
+            Xunit.Assert.True(success);
         }
 
         [Fact]
         public async Task AccessTokenAuthorizationFailureTest() {
             // Arrange
+
             var token = await _util.LogInTestUserAsync();
 
             // Fetch with token
@@ -117,23 +123,23 @@ namespace Cognita_Tests
             }
 
             // Assert
-            Assert.False(success);
+
+            Xunit.Assert.False(success);
         }
 
         [Fact]
         public async Task AccessTokenAuthorizationExpirationTest() {
             // Arrange
+
             var token = await _util.LogInTestUserAsync();
 
-
             //Expire the token
-
-            //var stuff = await _userManager.FindByNameAsync("Kalle");
 
             var ttime = GetTokenExpirationTime(token.AccessToken);
 
             var expired = CheckTokenIsValid(token.AccessToken);
 
+            // ToDo: No no! /Dimitris
             Thread.Sleep(2000);
 
             var ttimeAfter = GetTokenExpirationTime(token.AccessToken);
@@ -156,13 +162,15 @@ namespace Cognita_Tests
             }
 
             // Assert
-            Assert.False(success);
+
+            Xunit.Assert.False(success);
         }
 
         [Fact]
         public async Task Token_Should_Expire_As_Expected()
         {
             // Arrange
+
             var token = await _util.LogInTestUserAsync();
             var ttime = GetTokenExpirationTime(token.AccessToken);
 
@@ -174,13 +182,16 @@ namespace Cognita_Tests
             DateTime simulatedCurrentTime = expirationTimeUtc.AddMinutes(1); // 1 minute after expiration
 
             // Act
+
             bool isTokenExpired = simulatedCurrentTime >= expirationTimeUtc;
 
             // Assert
-            Assert.True(isTokenExpired, "Token should be expired.");
+
+            Xunit.Assert.True(isTokenExpired, "Token should be expired.");
         }
 
-        public static long GetTokenExpirationTime(string token)
+        // Straight up Stack Overflow
+        private static long GetTokenExpirationTime(string token)
         {
             var handler = new JwtSecurityTokenHandler();
             var jwtSecurityToken = handler.ReadJwtToken(token);
@@ -189,7 +200,7 @@ namespace Cognita_Tests
             return ticks;
         }
 
-        public static bool CheckTokenIsValid(string token)
+        private static bool CheckTokenIsValid(string token)
         {
             var tokenTicks = GetTokenExpirationTime(token);
             var tokenDate = DateTimeOffset.FromUnixTimeSeconds(tokenTicks).UtcDateTime;
