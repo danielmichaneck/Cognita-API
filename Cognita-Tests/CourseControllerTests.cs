@@ -1,8 +1,10 @@
 using Cognita_API.Infrastructure.Data;
 using Cognita_Infrastructure.Models.Dtos;
 using Cognita_Infrastructure.Models.Entities;
+using Cognita_Shared.Dtos.Course;
 using IntegrationTests;
 using Microsoft.AspNetCore.Identity;
+using Newtonsoft.Json;
 using System.Net;
 using System.Net.Http.Headers;
 
@@ -28,7 +30,7 @@ namespace Cognita_Tests
         }
 
         [Fact]
-        public async Task GetAllTest_Success() {
+        public async Task Get_All_Courses_Test_Success() {
             // Arrange
 
             TokenDto token = await _util.LogInTestUserAsync();
@@ -55,13 +57,43 @@ namespace Cognita_Tests
         }
 
         [Fact]
-        public async Task Get_All_Fail_Unautherized_Test()
+        public async Task Get_All_Courses_Fail_Unautherized_Test()
         {
             // Act
             var response = await _httpClient.GetAsync("api/courses");
 
             // Assert
             Assert.True(response.StatusCode == HttpStatusCode.Unauthorized);
+        }
+
+        [Fact]
+        public async Task Get_Course_Success_Test()
+        {
+            // Act
+            var response = await _httpClient.GetAsync("api/courses/1");
+
+            // Assert
+            Assert.True(response.StatusCode == HttpStatusCode.OK);
+        }
+
+        [Fact]
+        public async Task Get_Course_With_Details_Success_Test()
+        {
+            // Act
+            var response = await _httpClient.GetAsync("api/courses/1");
+
+            var courseAsJsonString = await response.Content.ReadAsStringAsync();
+
+            var course = JsonConvert.DeserializeObject<CourseWithDetailsDto>(courseAsJsonString);
+
+            // Assert
+            Assert.True(course is CourseWithDetailsDto);
+
+            var activityType = course.Modules
+                .FirstOrDefault().Activities
+                .FirstOrDefault().ActivityType;
+
+            Assert.True(activityType is not null);
         }
     }
 }

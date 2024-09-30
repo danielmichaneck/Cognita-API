@@ -369,3 +369,6 @@ MigrationBackup/
 
 # Fody - auto-generated XML schema
 FodyWeavers.xsd
+/Cognita API/Cognita_APIContext-3eb49d67-e382-43aa-8c21-fc5ba5439d18.db
+/Cognita API/Cognita_APIContext-3eb49d67-e382-43aa-8c21-fc5ba5439d18.db-shm
+/Cognita API/Cognita_APIContext-3eb49d67-e382-43aa-8c21-fc5ba5439d18.db-wal

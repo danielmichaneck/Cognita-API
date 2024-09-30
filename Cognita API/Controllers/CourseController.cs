@@ -52,7 +52,7 @@ namespace Cognita_API.Controllers
         )]
         [SwaggerResponse(StatusCodes.Status200OK, "The course was found", Type = typeof(CourseDto))]
         [SwaggerResponse(StatusCodes.Status404NotFound, "The course was not found")]
-        public async Task<ActionResult<CourseDto>> GetCourse(int id)
+        public async Task<ActionResult<CourseWithDetailsDto>> GetCourse(int id)
         {
             var course = await _serviceManager.CourseService.GetSingleCourseAsync(id);
 

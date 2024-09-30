@@ -7,7 +7,7 @@ public interface ICourseService
 {
     Task<IEnumerable<CourseDto>> GetCoursesAsync();
 
-    Task<CourseDto> GetSingleCourseAsync(int id);
+    Task<CourseWithDetailsDto> GetSingleCourseAsync(int id);
 
     Task<bool> EditCourseAsync(int id, CourseForUpdateDto dto);
 

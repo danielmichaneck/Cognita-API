@@ -55,9 +55,9 @@ public class CourseService : ICourseService
         return _mapper.Map<IEnumerable<CourseDto>>(courses);
     }
 
-    public async Task<CourseDto> GetSingleCourseAsync(int id)
+    public async Task<CourseWithDetailsDto> GetSingleCourseAsync(int id)
     {
         var course = await _uow.CourseRepository.GetSingleCourseAsync(id);
-        return _mapper.Map<CourseDto>(course);
+        return _mapper.Map<CourseWithDetailsDto>(course);
     }
 }
