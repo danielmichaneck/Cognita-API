@@ -28,7 +28,7 @@ namespace Cognita_Tests
         }
 
         [Fact]
-        public async Task GetAllModules_Test()
+        public async Task Get_All_Modules_Success_Test()
         {
             // Arrange
 
