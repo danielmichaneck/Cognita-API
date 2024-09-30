@@ -10,11 +10,10 @@ using Cognita_Shared.Enums;
 using Newtonsoft.Json;
 using System.Net.Http.Headers;
 using System.IdentityModel.Tokens.Jwt;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace Cognita_Tests
 {
-    [DoNotParallelize]
+    [Collection("DbCollection")]
     public class AuthControllerTests
     : IClassFixture<CustomWebApplicationFactory>
     {

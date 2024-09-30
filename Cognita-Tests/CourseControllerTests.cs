@@ -13,7 +13,7 @@ using System.Net.Http.Headers;
 
 namespace Cognita_Tests
 {
-    [DoNotParallelize]
+    [Collection("DbCollection")]
     public class CourseControllerTests
     : IClassFixture<CustomWebApplicationFactory>
     {
