@@ -73,11 +73,14 @@ namespace Cognita_API
             }).AddJwtBearer("Cognita Scheme",o => {
                 o.RequireHttpsMetadata = true;
                 o.SaveToken = true;
-                o.TokenValidationParameters = new TokenValidationParameters {
+                o.TokenValidationParameters = new TokenValidationParameters
+                {
                     ValidateIssuerSigningKey = true,
                     IssuerSigningKey = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(builder.Configuration["Jwt:Key"])),
                     ValidateIssuer = false,
-                    ValidateAudience = false
+                    ValidateAudience = false,
+                    ValidateLifetime = true,
+                    ClockSkew = TimeSpan.Zero
                 };
             });
 
