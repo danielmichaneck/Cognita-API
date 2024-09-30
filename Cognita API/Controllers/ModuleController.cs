@@ -1,7 +1,3 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using Cognita.API.Service.Contracts;
 using Cognita_Shared.Dtos.Module;
 using Microsoft.AspNetCore.Mvc;

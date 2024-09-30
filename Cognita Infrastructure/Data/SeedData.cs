@@ -209,10 +209,11 @@ namespace Cognita_Infrastructure.Data
         private static async Task GenerateUsersAsync(int numberOfUsers, IEnumerable<Course> courses) {
             var faker = new Faker<ApplicationUser>("sv").Rules((f, e) => {
                 e.Email = f.Person.Email;
-                e.UserName = f.Person.UserName;
+                e.UserName = e.Email;
                 e.User = new User()
                 {
-                    Name = f.Person.Email,
+                    Email = e.Email,
+                    Name = f.Person.FullName,
                     Role = UserRole.Student,
                     Course = f.PickRandom(courses)
                 };
@@ -230,7 +231,11 @@ namespace Cognita_Infrastructure.Data
             if (string.IsNullOrEmpty(passWord))
                 throw new Exception("password not exist in config");
 
+            int incrementalId = 0;
+
             foreach (var user in users) {
+                user.User.UserId = ++incrementalId;
+
                 var result = await userManager.CreateAsync(user, passWord);
                 if (!result.Succeeded) throw new Exception(string.Join("\n", result.Errors));
 

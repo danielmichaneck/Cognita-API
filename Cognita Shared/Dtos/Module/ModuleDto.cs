@@ -1,5 +1,4 @@
 using Cognita_Shared.Dtos.Activity;
-using Cognita_Shared.Entities;
 using System;
 
 namespace Cognita_Shared.Dtos.Module;

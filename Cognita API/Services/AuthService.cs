@@ -117,10 +117,10 @@ public class AuthService : IAuthService
         var user = new ApplicationUser {
             Email = userForRegistration.Email,
             UserName = userForRegistration.Email,
-
             User = new Cognita_Shared.Entities.User {
                 CourseId = userForRegistration.CourseId,
                 Name = userForRegistration.Name,
+                Email = userForRegistration.Email,
                 Role = UserRole.Student
             }
         };
