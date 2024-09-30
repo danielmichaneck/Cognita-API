@@ -13,12 +13,11 @@ namespace Cognita_Tests
     //[DoNotParallelize]
     [Collection("DbCollection")]
     public class CourseControllerTests
-  //  : IClassFixture<CustomWebApplicationFactory>
     {
-        private HttpClient _httpClient;
-        private CognitaDbContext _context;
-        private UserManager<ApplicationUser> _userManager;
-        private TestUtil _util;
+        private readonly HttpClient _httpClient;
+        private readonly CognitaDbContext _context;
+        private readonly UserManager<ApplicationUser> _userManager;
+        private readonly TestUtil _util;
 
         const string baseHttpAddress = "https://localhost:7147/api/";
 
