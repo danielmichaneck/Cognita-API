@@ -11,6 +11,7 @@ using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using System.Collections.ObjectModel;
 
 namespace IntegrationTests;
 public class CustomWebApplicationFactory : WebApplicationFactory<Program>
@@ -40,7 +41,28 @@ public class CustomWebApplicationFactory : WebApplicationFactory<Program>
             context.Course.AddRange([
                 new Course() {
                     Description = "This is a test course",
-                    CourseName = "Test course 1"
+                    CourseName = "Test course 1",
+                    StartDate = DateOnly.MinValue,
+                    EndDate = DateOnly.MaxValue,
+                    Modules = new Collection<Module>() {
+                        new Module() {
+                            Description = "This is a test module",
+                            ModuleName = "Test module 1",
+                            StartDate = DateOnly.MinValue,
+                            EndDate = DateOnly.MaxValue,
+                            Activities = new Collection<Activity>() {
+                                new Activity() {
+                                    Description = "This is a test activity",
+                                    ActivityName = "Test activity 1",
+                                    StartDate = DateTime.MinValue,
+                                    EndDate = DateTime.MaxValue,
+                                    ActivityType = new ActivityType() {
+                                        Title = "LESSON"
+                                    }
+                                }
+                            }
+                        }
+                    }
                 }
             ]);
 
