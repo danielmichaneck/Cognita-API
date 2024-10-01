@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Identity;
 using Newtonsoft.Json;
 using System.Net;
 using System.Net.Http.Headers;
+using System.Net.Http.Json;
 
 namespace Cognita_Tests
 {
@@ -93,6 +94,28 @@ namespace Cognita_Tests
                 .FirstOrDefault().ActivityType;
 
             Assert.True(activityType is not null);
+        }
+
+        [Fact]
+        public async Task Create_Course_Success_Test()
+        {
+            // Arrange
+
+            var newCourse = new CourseForCreationDto()
+            {
+                CourseName = "Test-course-1",
+                Description = "This is a test course generated in the Create_Course_Success_Test",
+                StartDate = DateOnly.MinValue,
+                EndDate = DateOnly.MaxValue
+            };
+
+            // Act
+
+            var response = await _httpClient.PostAsJsonAsync("api/courses", newCourse);
+
+            // Assert
+
+            Assert.True(response.IsSuccessStatusCode);
         }
     }
 }
