@@ -74,6 +74,7 @@ public class CustomWebApplicationFactory : WebApplicationFactory<Program>
                 {
                     Role = UserRole.Teacher,
                     Name = "Urban Ek",
+                    Email = "urban.ek@ek.se",
                     CourseId = 1
                 }
             }, "Password123!");

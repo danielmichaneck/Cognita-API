@@ -5,7 +5,8 @@ namespace Cognita_Domain.Contracts;
 
 public interface IUserRepository
 {
-    Task<IEnumerable<User>> GetAllParticipantsAsync(int courseId);
+    Task<IEnumerable<User>> GetUsersInCourseAsync(int courseId);
+    Task<IEnumerable<User>> GetAllUsersAsync();
     Task<User?> GetSingleUserAsync(int id, bool trackChanges = false);
     Task CreateUserAsync(User user);
 }

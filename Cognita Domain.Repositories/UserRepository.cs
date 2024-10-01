@@ -13,7 +13,10 @@ public class UserRepository : RepositoryBase<User>, IUserRepository
 
     public async Task CreateUserAsync(User user) => await CreateAsync(user);
 
-    public async Task<IEnumerable<User>> GetAllParticipantsAsync(int courseId) =>
+    public async Task<IEnumerable<User>> GetAllUsersAsync() =>
+        await GetAll().ToListAsync();
+
+    public async Task<IEnumerable<User>> GetUsersInCourseAsync(int courseId) =>
         await GetByCondition(u => u.CourseId == courseId).ToListAsync();
 
     public async Task<User?> GetSingleUserAsync(int id, bool trackChanges = false) =>
