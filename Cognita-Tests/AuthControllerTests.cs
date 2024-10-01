@@ -132,7 +132,7 @@ namespace Cognita_Tests
             var expired = CheckTokenIsValid(token.AccessToken);
 
             // ToDo: No no! /Dimitris
-            Thread.Sleep(2000);
+            Thread.Sleep(5000);
 
             var ttimeAfter = GetTokenExpirationTime(token.AccessToken);
 
