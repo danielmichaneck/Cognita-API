@@ -9,5 +9,6 @@ public class UserDto
     public required string Email { get; set; }
     public required string Name { get; set; }
     public required UserRole Role { get; set; }
+    public string CourseName { get; set; }
     public int CourseId { get; set; }
 }
