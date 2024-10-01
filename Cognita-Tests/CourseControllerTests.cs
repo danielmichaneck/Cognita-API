@@ -117,5 +117,27 @@ namespace Cognita_Tests
 
             Assert.True(response.IsSuccessStatusCode);
         }
+
+        [Fact]
+        public async Task Edit_Course_Success_Test()
+        {
+            // Arrange
+
+            var newCourse = new CourseForUpdateDto()
+            {
+                CourseName = "Test-course-1",
+                Description = "This is a test course generated in the Create_Course_Success_Test",
+                StartDate = DateOnly.MinValue,
+                EndDate = DateOnly.MaxValue
+            };
+
+            // Act
+
+            var response = await _httpClient.PutAsJsonAsync("api/courses/1", newCourse);
+
+            // Assert
+
+            Assert.True(response.IsSuccessStatusCode);
+        }
     }
 }
