@@ -2,10 +2,13 @@
 using System.Security.Claims;
 using System.Security.Cryptography;
 using System.Text;
+using AutoMapper;
 using Cognita.API.Service.Contracts;
 using Cognita_API.Controllers;
 using Cognita_Infrastructure.Models.Dtos;
 using Cognita_Infrastructure.Models.Entities;
+using Cognita_Shared.Dtos.User;
+using Cognita_Shared.Entities;
 using Cognita_Shared.Enums;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.IdentityModel.Tokens;
@@ -16,16 +19,19 @@ public class AuthService : IAuthService
 {
     private readonly UserManager<ApplicationUser> _userManager;
     private readonly IConfiguration _configuration;
+    private readonly IMapper _mapper;
     private ApplicationUser? _user;
 
     public AuthService(
         UserManager<ApplicationUser> userManager,
         //RoleManager<IdentityRole> roleManager,
-        IConfiguration configuration
+        IConfiguration configuration,
+        IMapper mapper
     )
     {
         _userManager = userManager;
         _configuration = configuration;
+        _mapper = mapper;
     }
 
     /// <summary>
@@ -196,5 +202,19 @@ public class AuthService : IAuthService
         }
 
         return principal;
+    }
+
+    public async Task<User?> GetUserAsync(int id) {
+        var user = await _userManager.FindByIdAsync(id.ToString());
+        if (user is null) return null;
+        return user.User;
+    }
+
+    public async Task<bool> UpdateUser(int id, UserForUpdateDto dto)
+    {
+        var user = await _userManager.FindByIdAsync(id.ToString());
+        if (user is null) return false;
+        _mapper.Map(dto, user.User);
+        return true;
     }
 }

@@ -43,7 +43,9 @@ public class UserService : IUserService
 
     public async Task<UserDto> GetSingleUserAsync(int userId) {
         var user = await _uow.UserRepository.GetSingleUserAsync(userId);
-        return _mapper.Map<UserDto>(user);
+        var userDto = _mapper.Map<UserDto>(user);
+        userDto.CourseName = user.Course.CourseName;
+        return userDto;
     }
 
     public async Task<bool> UpdateUserAsync(int userId, UserForUpdateDto dto) {

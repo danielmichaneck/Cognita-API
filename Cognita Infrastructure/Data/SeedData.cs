@@ -221,6 +221,10 @@ namespace Cognita_Infrastructure.Data
 
             var users = faker.Generate(numberOfUsers);
 
+            foreach(ApplicationUser user in users) {
+                //user.User.AppUserId = user.Id;
+            }
+
             var numberOfTeachers = Math.Ceiling((double)users.Count / 5);
 
             for (int i = 0; i < numberOfTeachers; i++) {
@@ -234,7 +238,7 @@ namespace Cognita_Infrastructure.Data
             int incrementalId = 0;
 
             foreach (var user in users) {
-                user.User.UserId = ++incrementalId;
+                //user.User.UserId = ++incrementalId;
 
                 var result = await userManager.CreateAsync(user, passWord);
                 if (!result.Succeeded) throw new Exception(string.Join("\n", result.Errors));

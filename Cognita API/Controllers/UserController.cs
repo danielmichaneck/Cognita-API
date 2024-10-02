@@ -58,5 +58,25 @@ namespace Cognita_API.Controllers
 
             return Ok(users);
         }
+
+        [HttpPut("users/{id}")]
+        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(UserDto))]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [SwaggerOperation(
+            Summary = "Update user",
+            Description = "Updates a user with the given id.",
+            OperationId = "UpdateUser"
+        )]
+        [SwaggerResponse(StatusCodes.Status200OK, "User updated", Type = typeof(UserDto))]
+        [SwaggerResponse(StatusCodes.Status404NotFound, "User not found")]
+        public async Task<ActionResult> UpdateUser(int id, UserForUpdateDto dto)
+        {
+            var result = await _serviceManager.AuthService.UpdateUser(id, dto);
+            if (!result) {
+                return NotFound();
+            }
+
+            return Ok();
+        }
     }
 }
