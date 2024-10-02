@@ -83,19 +83,7 @@ public class CustomWebApplicationFactory : WebApplicationFactory<Program>
                 Name = "Urban Ek"
             };
 
-            var courses = newUser.Courses;
-
-            var course = newCourse;
-
-            var user = newUser;
-
-            //if (newCourse is null) throw new NullReferenceException();
-
-            //if (newUser is null) throw new NullReferenceException();
-
-            //if (newUser.Courses is null) throw new NullReferenceException();
-
-            newUser.Courses = new List<Course>([newCourse]);
+            newUser.Courses = [newCourse];
 
             context.Course.AddRange([
                 newCourse

@@ -1,4 +1,5 @@
-﻿using System.IdentityModel.Tokens.Jwt;
+﻿using System.Collections.Generic;
+using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Security.Cryptography;
 using System.Text;
@@ -218,28 +219,50 @@ public class AuthService : IAuthService
         return principal;
     }
 
-    public async Task<ApplicationUser?> GetUserAsync(int id) {
+    public async Task<UserDto?> GetUserAsync(int id) {
         var user = await _userManager.FindByIdAsync(id.ToString());
         if (user is null) return null;
-        return user;
+        return _mapper.Map<UserDto>(user);
     }
 
-    public async Task<IEnumerable<ApplicationUser>> GetUsersAsync(int? courseId = null)
-    {
-        var users = _userManager.Users;
-        if (courseId is null) return users;
-        return await users
-            .Where(u => u.Courses
-                .Where(c => c.CourseId == courseId)
-                .Any())
-            .ToListAsync();
+    public async Task<IEnumerable<UserDto>> GetUsersAsync(int? courseId = null) {
+        var users = _userManager.Users.Include(u => u.Courses);
+        var userDtos = new List<UserDto>();
+        if (courseId is null) { 
+            foreach (ApplicationUser user in users) {
+                var userDto = _mapper.Map<UserDto>(user);
+                if (user.Courses is null) throw new NullReferenceException("User courses is null");
+                var course = user.Courses.FirstOrDefault();
+                if (course is null) throw new ArgumentException("A user has null or default courses.");
+                userDto.CourseName = course.CourseName;
+                userDtos.Add(userDto);
+            }
+            return userDtos;
+        }
+
+        var courseUsers = await users.Where(u => u.Courses
+                                        .Where(c => c.CourseId == courseId)
+                                        .Any())
+                                     .ToListAsync();
+
+        foreach (ApplicationUser user in users) {
+            var userDto = _mapper.Map<UserDto>(user);
+            if (user.Courses is null) throw new NullReferenceException("User courses is null");
+            var course = user.Courses.FirstOrDefault();
+            if (course is null) throw new ArgumentException("A user has null or default courses.");
+            userDto.CourseName = course.CourseName;
+            userDtos.Add(userDto);
+        }
+
+        return userDtos;
     }
 
-    public async Task<bool> UpdateUser(int id, UserForUpdateDto dto)
-    {
+    public async Task<bool> UpdateUser(int id, UserForUpdateDto dto) {
         var user = await _userManager.FindByIdAsync(id.ToString());
         if (user is null) return false;
         _mapper.Map(dto, user);
+        //user.UserName = dto.Email;
+        //await _userManager.UpdateAsync(user);
         return true;
     }
 }

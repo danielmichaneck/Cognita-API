@@ -50,7 +50,7 @@ namespace Cognita_API.Controllers
         [SwaggerResponse(StatusCodes.Status404NotFound, "No users found")]
         public async Task<ActionResult<IEnumerable<UserDto>>> GetAllUsers()
         {
-            var users = await _serviceManager.UserService.GetAllUsersAsync();
+            var users = await _serviceManager.AuthService.GetUsersAsync();
 
             if (users is null) {
                 return NotFound();
