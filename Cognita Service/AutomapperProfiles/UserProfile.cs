@@ -1,5 +1,5 @@
-using System;
 using AutoMapper;
+using Cognita_Infrastructure.Models.Entities;
 using Cognita_Shared.Dtos.User;
 using Cognita_Shared.Entities;
 
@@ -9,8 +9,8 @@ internal class UserProfile : Profile
 {
     public UserProfile()
     {
-        CreateMap<User, UserDto>().ReverseMap();
-        CreateMap<User, UserForCreationDto>().ReverseMap();
-        CreateMap<User, UserForUpdateDto>().ReverseMap();
+        CreateMap<ApplicationUser, UserDto>().ReverseMap();
+        CreateMap<ApplicationUser, UserForCreationDto>().ReverseMap();
+        CreateMap<ApplicationUser, UserForUpdateDto>().ReverseMap();
     }
 }

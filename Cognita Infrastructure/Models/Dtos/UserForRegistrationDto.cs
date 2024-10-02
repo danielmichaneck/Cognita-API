@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using Cognita_Shared.Enums;
+using System.ComponentModel.DataAnnotations;
 
 namespace Cognita_Infrastructure.Models.Dtos;
 
@@ -8,12 +9,15 @@ public record UserForRegistrationDto
     public required string Name { get; init; }
 
     [Required(ErrorMessage = "Password is required")]
-    public string? Password { get; init; }
+    public required string? Password { get; init; }
 
     [Required(ErrorMessage = "Email is required")]
     [EmailAddress]
-    public string? Email { get; init; }
+    public required string? Email { get; init; }
 
     [Required(ErrorMessage = "CourseId is required")]
-    public int CourseId { get; init; }
+    public required int CourseId { get; init; }
+
+    [Required(ErrorMessage = "Role is required")]
+    public required UserRole Role { get; init; }
 }

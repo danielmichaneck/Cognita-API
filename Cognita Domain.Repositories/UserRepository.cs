@@ -15,11 +15,11 @@ public class UserRepository : RepositoryBase<User>, IUserRepository
 
     public async Task<IEnumerable<User>> GetAllUsersAsync() =>
         await GetAll()
-            .Include(c => c.Course)
+            //.Include(c => c.Course)
             .ToListAsync();
 
     public async Task<IEnumerable<User>> GetUsersInCourseAsync(int courseId) =>
-        await GetByCondition(u => u.CourseId == courseId).ToListAsync();
+        await GetAll().ToListAsync();
 
     public async Task<User?> GetSingleUserAsync(int id, bool trackChanges = false) =>
         trackChanges

@@ -70,13 +70,8 @@ public class CustomWebApplicationFactory : WebApplicationFactory<Program>
             {
                 Email = "urbanek@email.com",
                 UserName = "urbanek@email.com",
-                User = new User
-                {
-                    Role = UserRole.Teacher,
-                    Name = "Urban Ek",
-                    Email = "urban.ek@ek.se",
-                    CourseId = 1
-                }
+                Name = "Urban Ek",
+                CourseId = 1
             }, "Password123!");
 
             context.SaveChanges();

@@ -1,4 +1,5 @@
 ﻿using Cognita_Infrastructure.Models.Dtos;
+using Cognita_Infrastructure.Models.Entities;
 using Cognita_Shared.Dtos.User;
 using Cognita_Shared.Entities;
 using Microsoft.AspNetCore.Identity;
@@ -11,6 +12,6 @@ public interface IAuthService
     Task<TokenDto> RefreshTokenAsync(TokenDto token);
     Task<IdentityResult> RegisterUserAsync(UserForRegistrationDto userForRegistration);
     Task<bool> ValidateUserAsync(UserForAuthenticationDto user);
-    public Task<User?> GetUserAsync(int id);
+    public Task<ApplicationUser?> GetUserAsync(int id);
     public Task<bool> UpdateUser(int id, UserForUpdateDto dto);
 }

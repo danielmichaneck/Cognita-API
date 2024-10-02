@@ -40,12 +40,8 @@ namespace Cognita_Tests
             var user = new ApplicationUser {
                 UserName = USER_SEED_EMAIL,
                 Email = USER_SEED_EMAIL,
-                User = new User {
-                    Email = USER_SEED_EMAIL,
-                    Name = USER_SEED_NAME,
-                    Role = USER_SEED_ROLE,
-                    CourseId = USER_SEED_COURSE_ID
-                }
+                Name = USER_SEED_NAME,
+                CourseId = USER_SEED_COURSE_ID
             };
 
             try {

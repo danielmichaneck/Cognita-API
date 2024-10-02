@@ -4,7 +4,6 @@ using System.Security.Cryptography;
 using System.Text;
 using AutoMapper;
 using Cognita.API.Service.Contracts;
-using Cognita_API.Controllers;
 using Cognita_Infrastructure.Models.Dtos;
 using Cognita_Infrastructure.Models.Entities;
 using Cognita_Shared.Dtos.User;
@@ -18,18 +17,20 @@ namespace Cognita.API.Services;
 public class AuthService : IAuthService
 {
     private readonly UserManager<ApplicationUser> _userManager;
+    private readonly RoleManager<IdentityRole<int>> _roleManager;
     private readonly IConfiguration _configuration;
     private readonly IMapper _mapper;
     private ApplicationUser? _user;
 
     public AuthService(
         UserManager<ApplicationUser> userManager,
-        //RoleManager<IdentityRole> roleManager,
+        RoleManager<IdentityRole<int>> roleManager,
         IConfiguration configuration,
         IMapper mapper
     )
     {
         _userManager = userManager;
+        _roleManager = roleManager;
         _configuration = configuration;
         _mapper = mapper;
     }
@@ -98,7 +99,7 @@ public class AuthService : IAuthService
         var claims = new List<Claim>()
         {
             new Claim(ClaimTypes.Name, _user.UserName!),
-            new Claim(ClaimTypes.NameIdentifier, _user.Id!)
+            new Claim(ClaimTypes.NameIdentifier, _user.Id.ToString()!)
             //Add more if needed
         };
 
@@ -123,15 +124,18 @@ public class AuthService : IAuthService
         var user = new ApplicationUser {
             Email = userForRegistration.Email,
             UserName = userForRegistration.Email,
-            User = new Cognita_Shared.Entities.User {
-                CourseId = userForRegistration.CourseId,
-                Name = userForRegistration.Name,
-                Email = userForRegistration.Email,
-                Role = UserRole.Student
-            }
+            CourseId = userForRegistration.CourseId,
+            Name = userForRegistration.Name,
         };
 
         IdentityResult result = await _userManager.CreateAsync(user, userForRegistration.Password!);
+
+        // ToDo: Set up roles in configuration
+        if (userForRegistration.Role == UserRole.Teacher) {
+            await _userManager.AddToRoleAsync(user, "Admin");
+        } else {
+            await _userManager.AddToRoleAsync(user, "User");
+        }
 
         return result;
     }
@@ -204,17 +208,17 @@ public class AuthService : IAuthService
         return principal;
     }
 
-    public async Task<User?> GetUserAsync(int id) {
+    public async Task<ApplicationUser?> GetUserAsync(int id) {
         var user = await _userManager.FindByIdAsync(id.ToString());
         if (user is null) return null;
-        return user.User;
+        return user;
     }
 
     public async Task<bool> UpdateUser(int id, UserForUpdateDto dto)
     {
         var user = await _userManager.FindByIdAsync(id.ToString());
         if (user is null) return false;
-        _mapper.Map(dto, user.User);
+        _mapper.Map(dto, user);
         return true;
     }
 }

@@ -19,7 +19,7 @@ namespace Cognita_Infrastructure.Data
         private static Random random = new Random();
 
         private static UserManager<ApplicationUser> userManager = null!;
-        private static RoleManager<IdentityRole> roleManager = null!;
+        private static RoleManager<IdentityRole<int>> roleManager = null!;
         private static IConfiguration configuration = null!;
         private const string adminRole = "Admin";
         private const string userRole = "User";
@@ -32,7 +32,7 @@ namespace Cognita_Infrastructure.Data
                 return;
 
             userManager = serviceProvider.GetRequiredService<UserManager<ApplicationUser>>();
-            roleManager = serviceProvider.GetRequiredService<RoleManager<IdentityRole>>();
+            roleManager = serviceProvider.GetRequiredService<RoleManager<IdentityRole<int>>>();
             configuration = serviceProvider.GetRequiredService<IConfiguration>();
 
 
@@ -199,7 +199,7 @@ namespace Cognita_Infrastructure.Data
             foreach (var roleName in roleNames)
             {
                 if (await roleManager.RoleExistsAsync(roleName)) continue;
-                var Role = new IdentityRole { Name = roleName };
+                var Role = new IdentityRole<int> { Name = roleName };
                 var result = await roleManager.CreateAsync(Role);
 
                 if (!result.Succeeded) throw new Exception(string.Join("\n", result.Errors));
@@ -210,44 +210,31 @@ namespace Cognita_Infrastructure.Data
             var faker = new Faker<ApplicationUser>("sv").Rules((f, e) => {
                 e.Email = f.Person.Email;
                 e.UserName = e.Email;
-                e.User = new User()
-                {
-                    Email = e.Email,
-                    Name = f.Person.FullName,
-                    Role = UserRole.Student,
-                    Course = f.PickRandom(courses)
-                };
+                e.Name = f.Person.FullName;
+                e.Course = f.PickRandom(courses);
             });
 
             var users = faker.Generate(numberOfUsers);
 
-            foreach(ApplicationUser user in users) {
-                //user.User.AppUserId = user.Id;
-            }
-
-            var numberOfTeachers = Math.Ceiling((double)users.Count / 5);
-
-            for (int i = 0; i < numberOfTeachers; i++) {
-                users[i].User.Role = UserRole.Teacher;
-            }
+            double numberOfTeachers = Math.Ceiling((double)users.Count / 5);
 
             var passWord = configuration["password"];
+
             if (string.IsNullOrEmpty(passWord))
                 throw new Exception("password not exist in config");
 
-            int incrementalId = 0;
+            int i = 0;
 
             foreach (var user in users) {
-                //user.User.UserId = ++incrementalId;
-
                 var result = await userManager.CreateAsync(user, passWord);
                 if (!result.Succeeded) throw new Exception(string.Join("\n", result.Errors));
 
-                if (user.User.Role == UserRole.Teacher) {
+                if (i < numberOfTeachers) {
                     await userManager.AddToRoleAsync(user, adminRole);
                 } else {
                     await userManager.AddToRoleAsync(user, userRole);
                 }
+                i++;
             }
         }
     }

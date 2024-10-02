@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Identity;
 using Cognita_Infrastructure.Models.Entities;
 using System.Net.Http.Headers;
 using System.IdentityModel.Tokens.Jwt;
+using Cognita_Shared.Enums;
 
 namespace Cognita_Tests
 {
@@ -55,7 +56,8 @@ namespace Cognita_Tests
                 Name = "Daniel M",
                 Email = "daniel.m@hemsida.se",
                 Password = "test123",
-                CourseId = 1
+                CourseId = 1,
+                Role = UserRole.Student
             };
 
             // Act

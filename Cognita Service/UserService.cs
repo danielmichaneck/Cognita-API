@@ -30,7 +30,7 @@ public class UserService : IUserService
         var userDtos = new List<UserDto>();
         foreach (User user in users) {
             var userDto = _mapper.Map<UserDto>(user);
-            userDto.CourseName = user.Course.CourseName;
+            userDto.CourseName = "user.Course.CourseName";
             userDtos.Add(userDto);
         }
         return userDtos.AsEnumerable();
@@ -44,7 +44,7 @@ public class UserService : IUserService
     public async Task<UserDto> GetSingleUserAsync(int userId) {
         var user = await _uow.UserRepository.GetSingleUserAsync(userId);
         var userDto = _mapper.Map<UserDto>(user);
-        userDto.CourseName = user.Course.CourseName;
+        userDto.CourseName = "user.Course.CourseName;";
         return userDto;
     }
 

@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Cognita_API.Infrastructure.Data
 {
-    public class CognitaDbContext : IdentityDbContext<ApplicationUser, IdentityRole, string>
+    public class CognitaDbContext : IdentityDbContext<ApplicationUser, IdentityRole<int>, int>
     {
         public CognitaDbContext(DbContextOptions<CognitaDbContext> options)
             : base(options) { }
