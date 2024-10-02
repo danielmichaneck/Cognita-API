@@ -97,6 +97,8 @@ namespace Cognita_API
 
             var app = builder.Build();
 
+            await app.CreateRolesAsync();
+
             // Configure the HTTP request pipeline.
             if (app.Environment.IsDevelopment()) {
                 app.UseSwagger();

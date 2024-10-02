@@ -51,7 +51,7 @@ namespace Cognita_Infrastructure.Data
 
             await context.SaveChangesAsync();
 
-            await CreateRolesAsync(new[] { adminRole, userRole });
+            //await CreateRolesAsync(new[] { adminRole, userRole });
             await GenerateUsersAsync(100, courses);
 
             //Null check on services!
