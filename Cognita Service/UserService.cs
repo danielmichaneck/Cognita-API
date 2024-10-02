@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 using AutoMapper;
 using Cognita_Domain.Contracts;
 using Cognita_Service.Contracts;
@@ -26,7 +27,13 @@ public class UserService : IUserService
 
     public async Task<IEnumerable<UserDto>> GetAllUsersAsync() {
         var users = await _uow.UserRepository.GetAllUsersAsync();
-        return _mapper.Map<IEnumerable<UserDto>>(users);
+        var userDtos = new List<UserDto>();
+        foreach (User user in users) {
+            var userDto = _mapper.Map<UserDto>(user);
+            userDto.CourseName = user.Course.CourseName;
+            userDtos.Add(userDto);
+        }
+        return userDtos.AsEnumerable();
     }
 
     public async Task<IEnumerable<UserDto>> GetUsersInCourseAsync(int courseId) {
