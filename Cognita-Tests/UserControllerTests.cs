@@ -7,9 +7,6 @@ using Microsoft.AspNetCore.Identity;
 using Cognita_Infrastructure.Models.Entities;
 using System.Net.Http.Headers;
 using System.IdentityModel.Tokens.Jwt;
-using Cognita_Shared.Dtos.User;
-using Cognita_Shared.Dtos.Course;
-using Newtonsoft.Json;
 
 namespace Cognita_Tests
 {
@@ -53,42 +50,6 @@ namespace Cognita_Tests
                 if (requestResult.IsSuccessStatusCode)
                 {
                     success = true;
-                }
-            }
-
-            // Assert
-
-            Assert.True(success);
-        }
-
-        [Fact]
-        public async Task Get_All_Users_Course_Name_Success_Test()
-        {
-            // Arrange
-
-            TokenDto token = await _util.LogInTestUserAsync();
-            bool success = false;
-            IEnumerable<UserDto>? dtos;
-
-            // Act
-
-            using (var requestMessage = new HttpRequestMessage(HttpMethod.Get, "api/users"))
-            {
-                requestMessage.Headers.Authorization =
-                    new AuthenticationHeaderValue("Bearer", token.AccessToken);
-
-                var requestResult = await _httpClient.SendAsync(requestMessage);
-
-                if (requestResult.IsSuccessStatusCode)
-                {
-                    var usersAsJsonString = await requestResult.Content.ReadAsStringAsync();
-                    dtos = JsonConvert.DeserializeObject<IEnumerable<UserDto>>(usersAsJsonString);
-                    if (dtos is not null && dtos.Any()) {
-                        if (dtos.FirstOrDefault().CourseName is not null &&
-                             !String.IsNullOrWhiteSpace(dtos.FirstOrDefault().CourseName)) {
-                            success = true;
-                        }
-                    }
                 }
             }
 

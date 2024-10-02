@@ -14,9 +14,7 @@ public class UserRepository : RepositoryBase<User>, IUserRepository
     public async Task CreateUserAsync(User user) => await CreateAsync(user);
 
     public async Task<IEnumerable<User>> GetAllUsersAsync() =>
-        await GetAll()
-            .Include(c => c.Course)
-            .ToListAsync();
+        await GetAll().ToListAsync();
 
     public async Task<IEnumerable<User>> GetUsersInCourseAsync(int courseId) =>
         await GetByCondition(u => u.CourseId == courseId).ToListAsync();
