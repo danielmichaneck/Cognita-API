@@ -19,7 +19,7 @@ public class UserService : IUserService
         _uow = uow;
     }
 
-    public async Task<UserDto> AddUserAsync(UserForCreationDto dto) {
+    public async Task<UserDto> AddUserAsync(UserForRegistrationDto dto) {
         var user = _mapper.Map<User>(dto);
         await _uow.UserRepository.CreateUserAsync(user);
         return _mapper.Map<UserDto>(user);

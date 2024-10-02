@@ -47,11 +47,12 @@ namespace Cognita_API
                     },
                     new string[] {}
                 }});
-
             });
-                builder.Services.AddDbContext<CognitaDbContext>(Options =>
-                Options.UseSqlite(builder.Configuration.GetConnectionString("Cognita_APIContext"))
-            );
+
+            builder.Services.AddDbContext<CognitaDbContext>(Options => {
+                Options.UseSqlite(builder.Configuration.GetConnectionString("Cognita_APIContext"));
+                Options.EnableSensitiveDataLogging();
+            });
 
             builder
                 .Services.AddIdentityCore<ApplicationUser>(opt => {

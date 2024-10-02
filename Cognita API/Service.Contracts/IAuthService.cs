@@ -13,5 +13,6 @@ public interface IAuthService
     Task<IdentityResult> RegisterUserAsync(UserForRegistrationDto userForRegistration);
     Task<bool> ValidateUserAsync(UserForAuthenticationDto user);
     public Task<ApplicationUser?> GetUserAsync(int id);
+    public Task<IEnumerable<ApplicationUser>> GetUsersAsync(int? courseId = null);
     public Task<bool> UpdateUser(int id, UserForUpdateDto dto);
 }

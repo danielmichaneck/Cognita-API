@@ -21,10 +21,13 @@ public class CourseRepository : RepositoryBase<Course>, ICourseRepository
 
     public async Task<IEnumerable<Course>> GetAllCoursesAsync() => await GetAll().ToListAsync();
 
-    public async Task<Course?> GetSingleCourseAsync(int id, bool trackChanges) =>
+    public async Task<Course?> GetSingleCourseAsync(int id, bool trackChanges = false) =>
         await GetByCondition(c => c.CourseId == id, trackChanges)
             .Include(c => c.Modules)
             .ThenInclude(m => m.Activities)
             .ThenInclude(a => a.ActivityType)
             .FirstOrDefaultAsync();
+
+    public async Task<Course?> GetSingleCourseWithoutDetailsAsync(int id, bool trackChanges = false) =>
+        await GetByCondition(c => c.CourseId == id, trackChanges).FirstOrDefaultAsync();
 }

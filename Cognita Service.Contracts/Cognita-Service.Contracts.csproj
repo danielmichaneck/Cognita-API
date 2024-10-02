@@ -1,6 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <ItemGroup>
+    <ProjectReference Include="..\Cognita Infrastructure\Cognita-Infrastructure.csproj" />
     <ProjectReference Include="..\Cognita Shared\Cognita-Shared.csproj" />
   </ItemGroup>
 

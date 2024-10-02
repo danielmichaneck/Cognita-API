@@ -8,6 +8,7 @@ using Cognita_Infrastructure.Models.Entities;
 using System.Net.Http.Headers;
 using System.IdentityModel.Tokens.Jwt;
 using Cognita_Shared.Enums;
+using Cognita_Shared.Dtos.User;
 
 namespace Cognita_Tests
 {

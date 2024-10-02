@@ -6,10 +6,12 @@ using AutoMapper;
 using Cognita.API.Service.Contracts;
 using Cognita_Infrastructure.Models.Dtos;
 using Cognita_Infrastructure.Models.Entities;
+using Cognita_Service.Contracts;
 using Cognita_Shared.Dtos.User;
 using Cognita_Shared.Entities;
 using Cognita_Shared.Enums;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 
 namespace Cognita.API.Services;
@@ -20,19 +22,22 @@ public class AuthService : IAuthService
     private readonly RoleManager<IdentityRole<int>> _roleManager;
     private readonly IConfiguration _configuration;
     private readonly IMapper _mapper;
+    private readonly ICourseService _courseService;
     private ApplicationUser? _user;
 
     public AuthService(
         UserManager<ApplicationUser> userManager,
         RoleManager<IdentityRole<int>> roleManager,
         IConfiguration configuration,
-        IMapper mapper
+        IMapper mapper,
+        ICourseService courseService
     )
     {
         _userManager = userManager;
         _roleManager = roleManager;
         _configuration = configuration;
         _mapper = mapper;
+        _courseService = courseService;
     }
 
     /// <summary>
@@ -124,9 +129,14 @@ public class AuthService : IAuthService
         var user = new ApplicationUser {
             Email = userForRegistration.Email,
             UserName = userForRegistration.Email,
-            CourseId = userForRegistration.CourseId,
-            Name = userForRegistration.Name,
+            Name = userForRegistration.Name
         };
+
+        var course = await _courseService.GetCourse(userForRegistration.CourseId);
+
+        if (course is null) throw new ArgumentException("The course does not exist.");
+
+        user.Courses = [course];
 
         IdentityResult result = await _userManager.CreateAsync(user, userForRegistration.Password!);
 
@@ -212,6 +222,17 @@ public class AuthService : IAuthService
         var user = await _userManager.FindByIdAsync(id.ToString());
         if (user is null) return null;
         return user;
+    }
+
+    public async Task<IEnumerable<ApplicationUser>> GetUsersAsync(int? courseId = null)
+    {
+        var users = _userManager.Users;
+        if (courseId is null) return users;
+        return await users
+            .Where(u => u.Courses
+                .Where(c => c.CourseId == courseId)
+                .Any())
+            .ToListAsync();
     }
 
     public async Task<bool> UpdateUser(int id, UserForUpdateDto dto)

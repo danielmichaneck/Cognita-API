@@ -211,7 +211,7 @@ namespace Cognita_Infrastructure.Data
                 e.Email = f.Person.Email;
                 e.UserName = e.Email;
                 e.Name = f.Person.FullName;
-                e.Course = f.PickRandom(courses);
+                e.Courses = new List<Course>([f.PickRandom(courses)]);
             });
 
             var users = faker.Generate(numberOfUsers);

@@ -10,7 +10,7 @@ internal class UserProfile : Profile
     public UserProfile()
     {
         CreateMap<ApplicationUser, UserDto>().ReverseMap();
-        CreateMap<ApplicationUser, UserForCreationDto>().ReverseMap();
+        CreateMap<ApplicationUser, UserForRegistrationDto>().ReverseMap();
         CreateMap<ApplicationUser, UserForUpdateDto>().ReverseMap();
     }
 }

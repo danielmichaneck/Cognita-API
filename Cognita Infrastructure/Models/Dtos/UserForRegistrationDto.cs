@@ -1,9 +1,10 @@
 ﻿using Cognita_Shared.Enums;
+using System;
 using System.ComponentModel.DataAnnotations;
 
-namespace Cognita_Infrastructure.Models.Dtos;
+namespace Cognita_Shared.Dtos.User;
 
-public record UserForRegistrationDto
+public class UserForRegistrationDto
 {
     [Required(ErrorMessage = "Name is required")]
     public required string Name { get; init; }
