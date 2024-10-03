@@ -1,11 +1,12 @@
 ﻿using Cognita.API.Service.Contracts;
 using Cognita_Shared.Dtos.Activity;
+using Cognita_Shared.Dtos.Course;
 using Cognita_Shared.Dtos.Module;
 using Microsoft.AspNetCore.Mvc;
 using Swashbuckle.AspNetCore.Annotations;
 
 namespace Cognita_API.Controllers {
-    [Route("api/courses/{id}/modules/{id2}/activities")]
+    [Route("api/")]
     [ApiController]
     public class ActivityController : ControllerBase {
         private readonly IServiceManager _serviceManager;
@@ -14,7 +15,7 @@ namespace Cognita_API.Controllers {
             _serviceManager = serviceManager;
         }
 
-        [HttpGet]
+        [HttpGet("courses/{id}/modules/{id2}/activities")]
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(ActivityDto))]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [SwaggerOperation(
@@ -34,7 +35,7 @@ namespace Cognita_API.Controllers {
             return Ok(activities);
         }
 
-        [HttpPost]
+        [HttpPost("courses/{id}/modules/{id2}/activities")]
         [ProducesResponseType(StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [SwaggerOperation(
@@ -57,6 +58,32 @@ namespace Cognita_API.Controllers {
                 new { moduleId = id, activityId = activityDTO.ActivityId },
                 activityDTO
             );
+        }
+
+        // PUT: api/activities
+        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
+        [HttpPut("activities/{id}")]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [SwaggerOperation(
+            Summary = "Edit an activity by id",
+            Description = "Edit an activity by id",
+            OperationId = "EditActivityById"
+        )]
+        [SwaggerResponse(StatusCodes.Status204NoContent, "Activity edited successfully")]
+        [SwaggerResponse(StatusCodes.Status400BadRequest, "Bad request")]
+        [SwaggerResponse(StatusCodes.Status404NotFound, "The activity was not found")]
+        public async Task<IActionResult> PutCourse(int id, ActivityForUpdateDto dto) {
+            if (!ModelState.IsValid) {
+                return BadRequest();
+            }
+
+            if (await _serviceManager.ActivityService.EditActivityAsync(id, dto)) {
+                return NoContent();
+            } else {
+                return NotFound();
+            }
         }
     }
 }
