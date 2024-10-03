@@ -6,6 +6,7 @@ using Swashbuckle.AspNetCore.Annotations;
 
 namespace Cognita_API.Controllers
 {
+    [Authorize]
     [Route("api/courses")]
     [ApiController]
     public class CourseController : ControllerBase
@@ -18,7 +19,6 @@ namespace Cognita_API.Controllers
         }
 
         // GET: api/Courses/
-        [Authorize]
         [HttpGet]
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(CourseDto))]
         [ProducesResponseType(StatusCodes.Status404NotFound)]

@@ -2,16 +2,21 @@
 using Cognita_Shared.Dtos.Activity;
 using Cognita_Shared.Dtos.Course;
 using Cognita_Shared.Dtos.Module;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Swashbuckle.AspNetCore.Annotations;
 
-namespace Cognita_API.Controllers {
+namespace Cognita_API.Controllers
+{
+    [Authorize]
     [Route("api/")]
     [ApiController]
-    public class ActivityController : ControllerBase {
+    public class ActivityController : ControllerBase
+    {
         private readonly IServiceManager _serviceManager;
 
-        public ActivityController(IServiceManager serviceManager) {
+        public ActivityController(IServiceManager serviceManager)
+        {
             _serviceManager = serviceManager;
         }
 
@@ -25,10 +30,12 @@ namespace Cognita_API.Controllers {
         )]
         [SwaggerResponse(StatusCodes.Status200OK, "Activities found", Type = typeof(ActivityDto))]
         [SwaggerResponse(StatusCodes.Status404NotFound, "No activities found")]
-        public async Task<ActionResult<IEnumerable<ActivityDto>>> GetActivitiesForModule(int id) {
+        public async Task<ActionResult<IEnumerable<ActivityDto>>> GetActivitiesForModule(int id)
+        {
             var activities = await _serviceManager.ActivityService.GetActivitiesAsync(id);
 
-            if (activities == null) {
+            if (activities == null)
+            {
                 return NotFound();
             }
 
@@ -45,8 +52,13 @@ namespace Cognita_API.Controllers {
         )]
         [SwaggerResponse(StatusCodes.Status201Created, "Activity created successfully")]
         [SwaggerResponse(StatusCodes.Status400BadRequest, "Bad request")]
-        public async Task<ActionResult<ActivityDto>> PostActivity(int id, ActivityForCreationDto dto) {
-            if (!ModelState.IsValid) {
+        public async Task<ActionResult<ActivityDto>> PostActivity(
+            int id,
+            ActivityForCreationDto dto
+        )
+        {
+            if (!ModelState.IsValid)
+            {
                 return BadRequest();
             }
             var activityDTO = await _serviceManager.ActivityService.CreateActivityAsync(
