@@ -170,7 +170,7 @@ public static class ServiceExtensions
             .ServiceProvider
             .GetRequiredService<RoleManager<IdentityRole<int>>>();
 
-        string[] roleNames = new string[] { "Admin", "User" };
+        string[] roleNames = ["Admin", "User"];
 
         foreach (var roleName in roleNames)
         {

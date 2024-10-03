@@ -40,7 +40,7 @@ namespace Cognita_Tests
         {
             // Arrange
 
-            TokenDto token = await _util.LogInTestUserAsync();
+            TokenDto token = await _util.LogInTestStudentAsync();
             bool success = false;
 
             // Act
@@ -68,7 +68,7 @@ namespace Cognita_Tests
         {
             // Arrange
 
-            TokenDto token = await _util.LogInTestUserAsync();
+            TokenDto token = await _util.LogInTestStudentAsync();
             bool success = false;
             IEnumerable<UserDto>? dtos;
 
@@ -104,7 +104,7 @@ namespace Cognita_Tests
         {
             // Arrange
 
-            TokenDto token = await _util.LogInTestUserAsync();
+            TokenDto token = await _util.LogInTestStudentAsync();
             bool success = false;
 
             // Act
@@ -132,7 +132,7 @@ namespace Cognita_Tests
         {
             // Arrange
 
-            TokenDto token = await _util.LogInTestUserAsync();
+            TokenDto token = await _util.LogInTestStudentAsync();
             bool success = false;
 
             var dto = new UserForUpdateDto() {

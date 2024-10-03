@@ -56,7 +56,7 @@ public class AuthService : IAuthService
         var jwtSettings = _configuration.GetSection("JwtSettings");
 
         SigningCredentials signing = GetSigningCredentials();
-        IEnumerable<Claim> claims = GetClaims();
+        IEnumerable<Claim> claims = await GetClaims();
         JwtSecurityToken tokenOptions = GenerateTokenOptions(signing, claims, long.Parse(jwtSettings["accessTokenExpirationTime"]));
 
         ArgumentNullException.ThrowIfNull(_user, nameof(_user));
@@ -100,16 +100,29 @@ public class AuthService : IAuthService
         return tokenOptions;
     }
 
-    private IEnumerable<Claim> GetClaims()
+    private async Task<IEnumerable<Claim>> GetClaims()
     {
         ArgumentNullException.ThrowIfNull(_user);
 
-        var claims = new List<Claim>()
-        {
-            new Claim(ClaimTypes.Name, _user.UserName!),
-            new Claim(ClaimTypes.NameIdentifier, _user.Id.ToString()!)
-            //Add more if needed
-        };
+        List<Claim> claims;
+
+        switch (await GetRoleAsync(_user)) {
+            case UserRole.Teacher:
+                claims = new List<Claim>() {
+                    new Claim(ClaimTypes.Name, _user.UserName!),
+                    new Claim(ClaimTypes.NameIdentifier, _user.Id.ToString()!),
+                    new Claim(ClaimTypes.Role, "Admin")
+                };
+                break;
+
+            default:
+                claims = new List<Claim>() {
+                    new Claim(ClaimTypes.Name, _user.UserName!),
+                    new Claim(ClaimTypes.NameIdentifier, _user.Id.ToString()!),
+                    new Claim(ClaimTypes.Role, "User")
+                };
+                break;
+        }
 
         return claims;
     }

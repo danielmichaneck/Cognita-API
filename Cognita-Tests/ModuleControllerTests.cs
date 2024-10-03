@@ -35,7 +35,7 @@ namespace Cognita_Tests
         {
             // Arrange
 
-            TokenDto token = await _util.LogInTestUserAsync();
+            TokenDto token = await _util.LogInTestStudentAsync();
 
             // Act
 
@@ -52,7 +52,7 @@ namespace Cognita_Tests
 
             // Arrange
 
-            TokenDto token = await _util.LogInTestUserAsync();
+            TokenDto token = await _util.LogInTestStudentAsync();
 
             var newModule = new ModuleForCreationDto() {
                 ModuleName = "Test Module 1",

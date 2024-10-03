@@ -32,7 +32,7 @@ namespace Cognita_Tests {
         public async Task Get_All_Modules_Success_Test() {
             // Arrange
 
-            TokenDto token = await _util.LogInTestUserAsync();
+            TokenDto token = await _util.LogInTestStudentAsync();
             bool success = false;
 
             // Act
@@ -58,7 +58,7 @@ namespace Cognita_Tests {
 
             // Arrange
 
-            TokenDto token = await _util.LogInTestUserAsync();
+            TokenDto token = await _util.LogInTestStudentAsync();
 
             var newActivity = new ActivityForCreationDto()
             {
@@ -84,7 +84,7 @@ namespace Cognita_Tests {
         {
             // Arrange
 
-            TokenDto token = await _util.LogInTestUserAsync();
+            TokenDto token = await _util.LogInTestStudentAsync();
 
             var updateActivity = new ActivityForCreationDto()
             {

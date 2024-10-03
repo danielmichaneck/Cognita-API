@@ -36,7 +36,7 @@ namespace Cognita_Tests
         public async Task Get_All_Courses_Test_Success() {
             // Arrange
 
-            TokenDto token = await _util.LogInTestUserAsync();
+            TokenDto token = await _util.LogInTestStudentAsync();
             bool success = false;
 
             // Act
@@ -74,7 +74,7 @@ namespace Cognita_Tests
         {
             // Arrange
 
-            TokenDto token = await _util.LogInTestUserAsync();
+            TokenDto token = await _util.LogInTestStudentAsync();
 
             // Act
 
@@ -90,7 +90,7 @@ namespace Cognita_Tests
         {
             // Arrange
 
-            TokenDto token = await _util.LogInTestUserAsync();
+            TokenDto token = await _util.LogInTestStudentAsync();
 
             // Act
 
@@ -106,7 +106,7 @@ namespace Cognita_Tests
         {
             // Arrange
 
-            TokenDto token = await _util.LogInTestUserAsync();
+            TokenDto token = await _util.LogInTestStudentAsync();
 
             // Act
 
@@ -135,7 +135,7 @@ namespace Cognita_Tests
         {
             // Arrange
 
-            TokenDto token = await _util.LogInTestUserAsync();
+            TokenDto token = await _util.LogInTestStudentAsync();
 
             var newCourse = new CourseForCreationDto()
             {
@@ -160,7 +160,7 @@ namespace Cognita_Tests
         {
             // Arrange
 
-            TokenDto token = await _util.LogInTestUserAsync();
+            TokenDto token = await _util.LogInTestStudentAsync();
 
             var newCourse = new CourseForUpdateDto()
             {

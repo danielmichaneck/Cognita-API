@@ -9,6 +9,7 @@ using System.IdentityModel.Tokens.Jwt;
 using Cognita_Shared.Enums;
 using Cognita_Shared.Dtos.User;
 using Cognita_Infrastructure.Data;
+using NuGet.Common;
 
 namespace Cognita_Tests
 {
@@ -33,11 +34,11 @@ namespace Cognita_Tests
         }
 
         [Fact]
-        public async Task LoginTest()
+        public async Task Log_In_Test()
         {
             // Arrange
 
-            var testUser = await _util.GetTestUserAuthenticationDtoAsync();
+            var testUser = await _util.GetTestStudentAuthenticationDtoAsync();
 
             // Act
 
@@ -49,13 +50,15 @@ namespace Cognita_Tests
         }
 
         [Fact]
-        public async Task RegisterUserTest()
+        public async Task Register_User_Success_Test()
         {
             // Arrange
 
+            var token = await _util.LogInTestTeacherAsync();
+
             var newUser = new UserForRegistrationDto() {
-                Name = "Daniel M",
-                Email = "daniel.m@hemsida.se",
+                Name = "Cool user",
+                Email = "user@cool.se",
                 Password = "test123",
                 CourseId = 1,
                 Role = UserRole.Student
@@ -63,6 +66,7 @@ namespace Cognita_Tests
 
             // Act
 
+            _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token.AccessToken);
             var response = await _httpClient.PostAsJsonAsync(baseHttpAddress + "authentication", newUser);
 
             // Assert
@@ -71,11 +75,37 @@ namespace Cognita_Tests
         }
 
         [Fact]
+        public async Task Register_User_Forbidden_Test()
+        {
+            // Arrange
+
+            var token = await _util.LogInTestStudentAsync();
+
+            var newUser = new UserForRegistrationDto()
+            {
+                Name = "Cool user",
+                Email = "user@cool.se",
+                Password = "test123",
+                CourseId = 1,
+                Role = UserRole.Student
+            };
+
+            // Act
+
+            _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token.AccessToken);
+            var response = await _httpClient.PostAsJsonAsync(baseHttpAddress + "authentication", newUser);
+
+            // Assert
+
+            Assert.True(response.StatusCode == HttpStatusCode.Forbidden);
+        }
+
+        [Fact]
         public async Task AccessTokenAuthorizationSuccessTest()
         {
             // Arrange
 
-            var token = await _util.LogInTestUserAsync();
+            var token = await _util.LogInTestStudentAsync();
 
             // Fetch with token
 
@@ -100,7 +130,7 @@ namespace Cognita_Tests
         public async Task AccessTokenAuthorizationFailureTest() {
             // Arrange
 
-            var token = await _util.LogInTestUserAsync();
+            var token = await _util.LogInTestStudentAsync();
 
             // Fetch with token
 
@@ -126,7 +156,7 @@ namespace Cognita_Tests
         public async Task AccessTokenAuthorizationExpirationTest() {
             // Arrange
 
-            var token = await _util.LogInTestUserAsync();
+            var token = await _util.LogInTestStudentAsync();
 
             //Expire the token
 
@@ -166,7 +196,7 @@ namespace Cognita_Tests
         {
             // Arrange
 
-            var token = await _util.LogInTestUserAsync();
+            var token = await _util.LogInTestStudentAsync();
             var ttime = GetTokenExpirationTime(token.AccessToken);
 
             long unixTimestamp = ttime; // Token's expiration time
