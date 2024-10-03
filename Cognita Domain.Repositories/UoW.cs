@@ -8,22 +8,26 @@ public class UoW : IUoW
 {
     private readonly Lazy<IModuleRepository> _moduleRepository;
     private readonly Lazy<ICourseRepository> _courseRepository;
+    private readonly Lazy<IActivityRepository> _activityRepository;
     private readonly Lazy<IUserRepository> _userRepository;
     private readonly CognitaDbContext _context;
 
     public ICourseRepository CourseRepository => _courseRepository.Value;
     public IModuleRepository ModuleRepository => _moduleRepository.Value;
+    public IActivityRepository ActivityRepository => _activityRepository.Value;
     public IUserRepository UserRepository => _userRepository.Value;
 
     public UoW(
         Lazy<ICourseRepository> courseRepository,
         Lazy<IModuleRepository> moduleRepository,
+        Lazy<IActivityRepository> activityRepository,
         Lazy<IUserRepository> userRepository,
         CognitaDbContext context
     )
     {
         _moduleRepository = moduleRepository;
         _courseRepository = courseRepository;
+        _activityRepository = activityRepository;
         _userRepository = userRepository;
         _context = context;
     }
