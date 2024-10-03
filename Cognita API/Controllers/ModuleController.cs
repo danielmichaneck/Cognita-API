@@ -1,10 +1,12 @@
 using Cognita.API.Service.Contracts;
 using Cognita_Shared.Dtos.Module;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Swashbuckle.AspNetCore.Annotations;
 
 namespace Cognita_API.Controllers
 {
+    [Authorize]
     [Route("api/courses/{id}/modules")]
     [ApiController]
     public class ModuleController : ControllerBase
