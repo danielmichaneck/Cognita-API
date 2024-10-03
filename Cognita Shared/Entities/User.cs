@@ -14,10 +14,6 @@ namespace Cognita_Shared.Entities
         public required string Name { get; set; }
         public required UserRole Role { get; set; }
 
-        // Foreign Key
-        public int CourseId { get; set; }
-
-        // Navigation property
-        public Course Course { get; set; }
+        
     }
 }

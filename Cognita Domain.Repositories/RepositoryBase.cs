@@ -1,6 +1,6 @@
 using System;
 using System.Linq.Expressions;
-using Cognita_API.Infrastructure.Data;
+using Cognita_Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 
 namespace Cognita_Domain.Repositories;

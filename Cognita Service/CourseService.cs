@@ -1,6 +1,7 @@
 using System;
 using AutoMapper;
 using Cognita_Domain.Contracts;
+using Cognita_Infrastructure.Models.Entities;
 using Cognita_Service.Contracts;
 using Cognita_Shared.Dtos.Course;
 using Cognita_Shared.Entities;
@@ -16,6 +17,11 @@ public class CourseService : ICourseService
     {
         _mapper = mapper;
         _uow = uow;
+    }
+
+    public async Task<Course?> GetCourse(int courseId)
+    {
+        return await _uow.CourseRepository.GetSingleCourseWithoutDetailsAsync(courseId, trackChanges: true);
     }
 
     public async Task<CourseDto> CreateCourseAsync(CourseForCreationDto dto)

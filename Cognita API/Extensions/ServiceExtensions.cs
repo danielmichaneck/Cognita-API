@@ -1,13 +1,13 @@
 ﻿using System.Text;
 using Cognita.API.Service.Contracts;
 using Cognita.API.Services;
-using Cognita_API.Infrastructure.Data;
 using Cognita_Domain.Contracts;
 using Cognita_Domain.Repositories;
 using Cognita_Infrastructure.Data;
 using Cognita_Service;
 using Cognita_Service.Contracts;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 
@@ -155,6 +155,26 @@ public static class ServiceExtensions
                 Console.WriteLine(ex.Message);
                 throw;
             }
+        }
+    }
+
+    public static async Task CreateRolesAsync(this IApplicationBuilder app)
+    {
+        var roleManager = app
+            .ApplicationServices
+            .CreateScope()
+            .ServiceProvider
+            .GetRequiredService<RoleManager<IdentityRole<int>>>();
+
+        string[] roleNames = new string[] { "Admin", "User" };
+
+        foreach (var roleName in roleNames)
+        {
+            if (await roleManager.RoleExistsAsync(roleName)) continue;
+            var Role = new IdentityRole<int> { Name = roleName };
+            var result = await roleManager.CreateAsync(Role);
+
+            if (!result.Succeeded) throw new Exception(string.Join("\n", result.Errors));
         }
     }
 }
