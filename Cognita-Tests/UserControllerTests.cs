@@ -1,6 +1,5 @@
 ﻿using System.Net.Http.Json;
 using IntegrationTests;
-using Cognita_API.Infrastructure.Data;
 using System.Net;
 using Cognita_Infrastructure.Models.Dtos;
 using Microsoft.AspNetCore.Identity;
@@ -10,6 +9,8 @@ using System.IdentityModel.Tokens.Jwt;
 using Cognita_Shared.Dtos.User;
 using Cognita_Shared.Dtos.Course;
 using Newtonsoft.Json;
+using System.Text.Json;
+using Cognita_Infrastructure.Data;
 
 namespace Cognita_Tests
 {
@@ -119,6 +120,46 @@ namespace Cognita_Tests
                     success = true;
                 }
             }
+
+            // Assert
+
+            Assert.True(success);
+        }
+
+        [Fact]
+        public async Task Update_User_Test_Success()
+        {
+            // Arrange
+
+            TokenDto token = await _util.LogInTestUserAsync();
+            bool success = false;
+
+            var dto = new UserForUpdateDto() {
+                Name = "Updated name",
+                Email = "Updated email"
+            };
+
+            // Act
+
+            var response = await _httpClient.PutAsJsonAsync("api/users/1", dto);
+
+            if (response.IsSuccessStatusCode)
+                success = true;
+
+            //using (var requestMessage = new HttpRequestMessage(HttpMethod.Put, "api/users/1"))
+            //{
+            //    requestMessage.Headers.Authorization =
+            //        new AuthenticationHeaderValue("Bearer", token.AccessToken);
+
+            //    requestMessage.Content = new StringContent(dtoAsJson);
+
+            //    var requestResult = await _httpClient.SendAsync(requestMessage);
+
+            //    if (requestResult.IsSuccessStatusCode)
+            //    {
+            //        success = true;
+            //    }
+            //}
 
             // Assert
 

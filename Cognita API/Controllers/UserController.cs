@@ -29,7 +29,7 @@ namespace Cognita_API.Controllers
         [SwaggerResponse(StatusCodes.Status404NotFound, "No users found")]
         public async Task<ActionResult<IEnumerable<UserDto>>> GetUsersInCourse(int id)
         {
-            var users = await _serviceManager.UserService.GetUsersInCourseAsync(id);
+            var users = await _serviceManager.AuthService.GetUsersAsync(id);
 
             if (users is null) {
                 return NotFound();
@@ -50,13 +50,33 @@ namespace Cognita_API.Controllers
         [SwaggerResponse(StatusCodes.Status404NotFound, "No users found")]
         public async Task<ActionResult<IEnumerable<UserDto>>> GetAllUsers()
         {
-            var users = await _serviceManager.UserService.GetAllUsersAsync();
+            var users = await _serviceManager.AuthService.GetUsersAsync();
 
             if (users is null) {
                 return NotFound();
             }
 
             return Ok(users);
+        }
+
+        [HttpPut("users/{id}")]
+        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(UserDto))]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [SwaggerOperation(
+            Summary = "Update user",
+            Description = "Updates a user with the given id.",
+            OperationId = "UpdateUser"
+        )]
+        [SwaggerResponse(StatusCodes.Status200OK, "User updated", Type = typeof(UserDto))]
+        [SwaggerResponse(StatusCodes.Status404NotFound, "User not found")]
+        public async Task<ActionResult> UpdateUser(int id, UserForUpdateDto dto)
+        {
+            var result = await _serviceManager.AuthService.UpdateUser(id, dto);
+            if (!result) {
+                return NotFound();
+            }
+
+            return Ok();
         }
     }
 }

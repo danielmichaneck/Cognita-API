@@ -1,6 +1,6 @@
 ﻿using System;
-using Cognita_API.Infrastructure.Data;
 using Cognita_Domain.Contracts;
+using Cognita_Infrastructure.Data;
 using Cognita_Shared.Entities;
 using Microsoft.EntityFrameworkCore;
 

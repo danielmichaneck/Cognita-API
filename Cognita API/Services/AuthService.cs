@@ -2,12 +2,16 @@
 using System.Security.Claims;
 using System.Security.Cryptography;
 using System.Text;
+using AutoMapper;
 using Cognita.API.Service.Contracts;
-using Cognita_API.Controllers;
+using Cognita_Infrastructure.Data;
 using Cognita_Infrastructure.Models.Dtos;
 using Cognita_Infrastructure.Models.Entities;
+using Cognita_Service.Contracts;
+using Cognita_Shared.Dtos.User;
 using Cognita_Shared.Enums;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 
 namespace Cognita.API.Services;
@@ -15,17 +19,28 @@ namespace Cognita.API.Services;
 public class AuthService : IAuthService
 {
     private readonly UserManager<ApplicationUser> _userManager;
+    private readonly RoleManager<IdentityRole<int>> _roleManager;
     private readonly IConfiguration _configuration;
+    private readonly IMapper _mapper;
+    private readonly ICourseService _courseService;
+    private readonly CognitaDbContext _context;
     private ApplicationUser? _user;
 
     public AuthService(
         UserManager<ApplicationUser> userManager,
-        //RoleManager<IdentityRole> roleManager,
-        IConfiguration configuration
+        RoleManager<IdentityRole<int>> roleManager,
+        IConfiguration configuration,
+        IMapper mapper,
+        ICourseService courseService,
+        CognitaDbContext context
     )
     {
         _userManager = userManager;
+        _roleManager = roleManager;
         _configuration = configuration;
+        _mapper = mapper;
+        _courseService = courseService;
+        _context = context;
     }
 
     /// <summary>
@@ -92,7 +107,7 @@ public class AuthService : IAuthService
         var claims = new List<Claim>()
         {
             new Claim(ClaimTypes.Name, _user.UserName!),
-            new Claim(ClaimTypes.NameIdentifier, _user.Id!)
+            new Claim(ClaimTypes.NameIdentifier, _user.Id.ToString()!)
             //Add more if needed
         };
 
@@ -117,15 +132,23 @@ public class AuthService : IAuthService
         var user = new ApplicationUser {
             Email = userForRegistration.Email,
             UserName = userForRegistration.Email,
-            User = new Cognita_Shared.Entities.User {
-                CourseId = userForRegistration.CourseId,
-                Name = userForRegistration.Name,
-                Email = userForRegistration.Email,
-                Role = UserRole.Student
-            }
+            Name = userForRegistration.Name
         };
 
+        var course = await _courseService.GetCourse(userForRegistration.CourseId);
+
+        if (course is null) throw new ArgumentException("The course does not exist.");
+
+        user.Courses = [course];
+
         IdentityResult result = await _userManager.CreateAsync(user, userForRegistration.Password!);
+
+        // ToDo: Set up roles in configuration
+        if (userForRegistration.Role == UserRole.Teacher) {
+            await _userManager.AddToRoleAsync(user, "Admin");
+        } else {
+            await _userManager.AddToRoleAsync(user, "User");
+        }
 
         return result;
     }
@@ -196,5 +219,71 @@ public class AuthService : IAuthService
         }
 
         return principal;
+    }
+
+    public async Task<UserDto?> GetUserAsync(int id) {
+        var user = await _userManager.FindByIdAsync(id.ToString());
+        if (user is null) return null;
+        return _mapper.Map<UserDto>(user);
+    }
+
+    public async Task<IEnumerable<UserDto>> GetUsersAsync(int? courseId = null) {
+        var users = await _userManager.Users.Include(u => u.Courses).ToListAsync();
+        var userDtos = new List<UserDto>();
+        if (courseId is null) {
+            return await CreateUserDtos(users);
+        }
+
+        var courseUsers = users.Where(u => u.Courses
+                                .Where(c => c.CourseId == courseId)
+                                .Any())
+                               .ToList();
+
+        return await CreateUserDtos(courseUsers);
+    }
+
+    public async Task<bool> UpdateUser(int id, UserForUpdateDto dto) {
+        var user = await _userManager.FindByIdAsync(id.ToString());
+        if (user is null) return false;
+        _mapper.Map(dto, user);
+        user.UserName = dto.Email;
+        user.NormalizedUserName = dto.Email.Normalize();
+        user.NormalizedEmail = dto.Email.Normalize();
+        await _userManager.UpdateAsync(user);
+        await _context.SaveChangesAsync();
+        return true;
+    }
+
+    private async Task<List<UserDto>> CreateUserDtos(List<ApplicationUser> users)
+    {
+        var userDtos = new List<UserDto>();
+        foreach (ApplicationUser user in users)
+        {
+            if (user.Courses is null) throw new NullReferenceException("User courses is null");
+            var userDto = _mapper.Map<UserDto>(user);
+            var course = user.Courses.FirstOrDefault();
+            if (course is null) throw new ArgumentException("A user has null or default courses.");
+            userDto.CourseName = course.CourseName;
+            userDto.CourseId = course.CourseId;
+            userDto.Role = await GetRoleAsync(user);
+            userDtos.Add(userDto);
+        }
+        return userDtos;
+    }
+
+    private async Task<UserRole> GetRoleAsync(ApplicationUser user)
+    {
+        var roles = await _userManager.GetRolesAsync(user);
+        switch (roles.FirstOrDefault())
+        {
+            case "Admin":
+                return UserRole.Teacher;
+
+            case "User":
+                return UserRole.Student;
+
+            default:
+                throw new ArgumentException("The user does not have a valid role.");
+        }
     }
 }

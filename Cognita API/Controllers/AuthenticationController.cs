@@ -1,6 +1,5 @@
 ﻿using Cognita.API.Service.Contracts;
 using Cognita_Infrastructure.Models.Dtos;
-using Cognita_Shared.Dtos.Course;
 using Cognita_Shared.Dtos.User;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -29,9 +28,9 @@ public class AuthenticationController : ControllerBase
         )]
     [SwaggerResponse(StatusCodes.Status201Created, "The user was registered successfully")]
     [SwaggerResponse(StatusCodes.Status400BadRequest, "The user was not registered")]
-    public async Task<IActionResult> RegisterUser(UserForRegistrationDto userForRegistration)
+    public async Task<IActionResult> RegisterUser(UserForRegistrationDto userForRegistrationDto)
     {
-        var result = await _serviceManager.AuthService.RegisterUserAsync(userForRegistration);
+        var result = await _serviceManager.AuthService.RegisterUserAsync(userForRegistrationDto);
         return result.Succeeded
             ? StatusCode(StatusCodes.Status201Created)
             : BadRequest(result.Errors);

@@ -6,7 +6,7 @@ namespace Cognita_Service.Contracts;
 
 public interface IUserService
 {
-    Task<UserDto> AddUserAsync(UserForCreationDto dto);
+    Task<UserDto> AddUserAsync(UserForRegistrationDto dto);
     Task<bool> UpdateUserAsync(int userId, UserForUpdateDto dto);
     Task<IEnumerable<UserDto>> GetAllUsersAsync();
     Task<IEnumerable<UserDto>> GetUsersInCourseAsync(int courseId);

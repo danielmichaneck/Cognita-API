@@ -1,5 +1,5 @@
 using Cognita.API.Extensions;
-using Cognita_API.Infrastructure.Data;
+using Cognita_Infrastructure.Data;
 using Cognita_Infrastructure.Models.Entities;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
@@ -47,11 +47,12 @@ namespace Cognita_API
                     },
                     new string[] {}
                 }});
-
             });
-                builder.Services.AddDbContext<CognitaDbContext>(Options =>
-                Options.UseSqlite(builder.Configuration.GetConnectionString("Cognita_APIContext"))
-            );
+
+            builder.Services.AddDbContext<CognitaDbContext>(Options => {
+                Options.UseSqlite(builder.Configuration.GetConnectionString("Cognita_APIContext"));
+                Options.EnableSensitiveDataLogging();
+            });
 
             builder
                 .Services.AddIdentityCore<ApplicationUser>(opt => {
@@ -60,8 +61,9 @@ namespace Cognita_API
                     opt.Password.RequireUppercase = false;
                     opt.Password.RequireNonAlphanumeric = false;
                     opt.Password.RequiredLength = 3;
+                    opt.User.RequireUniqueEmail = true;
                 })
-                .AddRoles<IdentityRole>()
+                .AddRoles<IdentityRole<int>>()
                 .AddEntityFrameworkStores<CognitaDbContext>()
                 .AddDefaultTokenProviders();
 
@@ -95,6 +97,8 @@ namespace Cognita_API
             });
 
             var app = builder.Build();
+
+            await app.CreateRolesAsync();
 
             // Configure the HTTP request pipeline.
             if (app.Environment.IsDevelopment()) {

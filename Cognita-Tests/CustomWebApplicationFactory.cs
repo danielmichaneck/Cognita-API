@@ -1,6 +1,6 @@
 ﻿using Bogus.Extensions.UnitedKingdom;
 using Cognita_API;
-using Cognita_API.Infrastructure.Data;
+using Cognita_Infrastructure.Data;
 using Cognita_Infrastructure.Models.Entities;
 using Cognita_Shared.Entities;
 using Cognita_Shared.Enums;
@@ -37,47 +37,60 @@ public class CustomWebApplicationFactory : WebApplicationFactory<Program>
             var scopedServices = scope.ServiceProvider;
             var context = scopedServices.GetRequiredService<CognitaDbContext>();
             var userManager = scopedServices.GetRequiredService<UserManager<ApplicationUser>>();
+            var roleManager = scopedServices.GetRequiredService<RoleManager<IdentityRole<int>>>();
 
-            context.Course.AddRange([
-                new Course() {
-                    Description = "This is a test course",
-                    CourseName = "Test course 1",
-                    StartDate = DateOnly.MinValue,
-                    EndDate = DateOnly.MaxValue,
-                    Modules = new Collection<Module>() {
-                        new Module() {
-                            Description = "This is a test module",
-                            ModuleName = "Test module 1",
-                            StartDate = DateOnly.MinValue,
-                            EndDate = DateOnly.MaxValue,
-                            Activities = new Collection<Activity>() {
-                                new Activity() {
-                                    Description = "This is a test activity",
-                                    ActivityName = "Test activity 1",
-                                    StartDate = DateTime.MinValue,
-                                    EndDate = DateTime.MaxValue,
-                                    ActivityType = new ActivityType() {
-                                        Title = "LESSON"
-                                    }
+            string[] roleNames = ["Admin", "User"];
+
+            foreach (var roleName in roleNames)
+            {
+                if (await roleManager.RoleExistsAsync(roleName)) continue;
+                var Role = new IdentityRole<int> { Name = roleName };
+                var result = await roleManager.CreateAsync(Role);
+
+                if (!result.Succeeded) throw new Exception(string.Join("\n", result.Errors));
+            }
+
+            var newCourse = new Course() {
+                Description = "This is a test course",
+                CourseName = "Test course 1",
+                StartDate = DateOnly.MinValue,
+                EndDate = DateOnly.MaxValue,
+                Modules = new Collection<Module>() {
+                    new Module() {
+                        Description = "This is a test module",
+                        ModuleName = "Test module 1",
+                        StartDate = DateOnly.MinValue,
+                        EndDate = DateOnly.MaxValue,
+                        Activities = new Collection<Activity>() {
+                            new Activity() {
+                                Description = "This is a test activity",
+                                ActivityName = "Test activity 1",
+                                StartDate = DateTime.MinValue,
+                                EndDate = DateTime.MaxValue,
+                                ActivityType = new ActivityType() {
+                                    Title = "LESSON"
                                 }
                             }
                         }
                     }
                 }
-            ]);
+            };
 
-            await userManager.CreateAsync(new ApplicationUser
+            var newUser = new ApplicationUser
             {
                 Email = "urbanek@email.com",
                 UserName = "urbanek@email.com",
-                User = new User
-                {
-                    Role = UserRole.Teacher,
-                    Name = "Urban Ek",
-                    Email = "urban.ek@ek.se",
-                    CourseId = 1
-                }
-            }, "Password123!");
+                Name = "Urban Ek"
+            };
+
+            newUser.Courses = [newCourse];
+
+            context.Course.AddRange([
+                newCourse
+            ]);
+
+            await userManager.CreateAsync(newUser, "Password123!");
+            await userManager.AddToRoleAsync(newUser, "Admin");
 
             context.SaveChanges();
             Context = context;
@@ -98,5 +111,10 @@ public class CustomWebApplicationFactory : WebApplicationFactory<Program>
         Context.Database.EnsureDeleted();
         Context.Dispose();
         return base.DisposeAsync();
+    }
+
+    private static async Task CreateRolesAsync(IWebHostBuilder builder)
+    {
+        
     }
 }

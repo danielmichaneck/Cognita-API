@@ -1,4 +1,4 @@
-﻿using Cognita_API.Infrastructure.Data;
+﻿using Cognita_Infrastructure.Data;
 using Cognita_Infrastructure.Models.Dtos;
 using Cognita_Infrastructure.Models.Entities;
 using Cognita_Shared.Dtos.Course;
