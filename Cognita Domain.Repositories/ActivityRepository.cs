@@ -36,9 +36,8 @@ public class ActivityRepository : RepositoryBase<Activity>, IActivityRepository 
         throw new NotImplementedException();
     }
 
-    public Task<Activity?> GetSingleActivityAsync(int id, bool trackChanges = false) {
-        throw new NotImplementedException();
-    }
+    public async Task<Activity?> GetSingleActivityAsync(int id, bool trackChanges = false) =>
+        await GetByCondition(a => a.ActivityId == id, trackChanges).FirstOrDefaultAsync();
 
     // public Task<bool> EditModuleAsync(int id, Module module) { }
 

@@ -8,6 +8,7 @@ public interface IUoW
     IModuleRepository ModuleRepository { get; }
     IActivityRepository ActivityRepository { get; }
     IUserRepository UserRepository { get; }
+    IActivityTypeRepository ActivityTypeRepository { get; }
 
     Task CompleteAsync();
 }
