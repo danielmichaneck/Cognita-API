@@ -70,6 +70,22 @@ namespace Cognita_Tests
         }
 
         [Fact]
+        public async Task Get_All_Courses_Success_Test()
+        {
+            // Arrange
+
+            TokenDto token = await _util.LogInTestUserAsync();
+
+            // Act
+
+            _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token.AccessToken);
+            var requestResult = await _httpClient.GetAsync("api/courses");
+
+            // Assert
+            Assert.True(requestResult.IsSuccessStatusCode);
+        }
+
+        [Fact]
         public async Task Get_Course_Success_Test()
         {
             // Arrange
@@ -95,7 +111,7 @@ namespace Cognita_Tests
             // Act
 
             _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token.AccessToken);
-            var requestResult = await _httpClient.GetAsync("api/courses");
+            var requestResult = await _httpClient.GetAsync("api/courses/1");
 
             Assert.True(requestResult.IsSuccessStatusCode);
 

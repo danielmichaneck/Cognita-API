@@ -55,7 +55,10 @@ namespace Cognita_Tests {
 
         [Fact]
         public async Task Create_Activity_Success_Test() {
+
             // Arrange
+
+            TokenDto token = await _util.LogInTestUserAsync();
 
             var newActivity = new ActivityForCreationDto()
             {
@@ -68,6 +71,7 @@ namespace Cognita_Tests {
 
             // Act
 
+            _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token.AccessToken);
             var response = await _httpClient.PostAsJsonAsync("api/courses/1/modules/1/activities", newActivity);
 
             // Assert
@@ -80,6 +84,8 @@ namespace Cognita_Tests {
         {
             // Arrange
 
+            TokenDto token = await _util.LogInTestUserAsync();
+
             var updateActivity = new ActivityForCreationDto()
             {
                 ActivityName = "Test Module 1",
@@ -91,6 +97,7 @@ namespace Cognita_Tests {
 
             // Act
 
+            _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token.AccessToken);
             var response = await _httpClient.PutAsJsonAsync("api/activities/1", updateActivity);
 
             // Assert
