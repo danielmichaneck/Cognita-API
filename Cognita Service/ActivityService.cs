@@ -25,7 +25,20 @@ namespace Cognita_Service {
         public async Task<ActivityDto> CreateActivityAsync(ActivityForCreationDto dto, int moduleId) {
             var activity = _mapper.Map<Activity>(dto);
 
+            var activityType = await _uow.ActivityTypeRepository.GetSingleActivityTypeAsync(dto.ActivityTypeId);
+
+            if (activityType is null) {
+                throw new NullReferenceException("The activity type does not exist.");
+            }
+
+            activity.ActivityType = activityType;
+
             var module = await _uow.ModuleRepository.GetSingleModuleAsync(moduleId, true);
+
+            if (module is null) {
+                throw new NullReferenceException("The module does not exist.");
+            }
+
             module.Activities.Add(activity);
 
             
@@ -43,6 +56,15 @@ namespace Cognita_Service {
             }
 
             _mapper.Map(dto, activity);
+
+            var activityType = await _uow.ActivityTypeRepository.GetSingleActivityTypeAsync(dto.ActivityTypeId);
+
+            if (activityType is null) {
+                return false;
+            }
+
+            activity.ActivityType = activityType;
+
             try {
                 await _uow.CompleteAsync();
                 return true;

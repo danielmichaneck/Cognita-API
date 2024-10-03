@@ -57,19 +57,41 @@ namespace Cognita_Tests {
         public async Task Create_Activity_Success_Test() {
             // Arrange
 
-            var newActivity = new ActivityForCreationDto() {
+            var newActivity = new ActivityForCreationDto()
+            {
                 ActivityName = "Test Module 1",
                 Description = "Testing at Create_Module_Success_Test",
                 StartDate = DateTime.MinValue,
                 EndDate = DateTime.MaxValue,
-                ActivityType = new Cognita_Shared.Entities.ActivityType {
-                    Title = "Seminar"
-                }
-        };
+                ActivityTypeId = 1
+            };
 
             // Act
 
             var response = await _httpClient.PostAsJsonAsync("api/courses/1/modules/1/activities", newActivity);
+
+            // Assert
+
+            Assert.True(response.IsSuccessStatusCode);
+        }
+
+        [Fact]
+        public async Task Edit_Activity_Success_Test()
+        {
+            // Arrange
+
+            var updateActivity = new ActivityForCreationDto()
+            {
+                ActivityName = "Test Module 1",
+                Description = "Testing at Create_Module_Success_Test",
+                StartDate = DateTime.MinValue,
+                EndDate = DateTime.MaxValue,
+                ActivityTypeId = 1
+            };
+
+            // Act
+
+            var response = await _httpClient.PutAsJsonAsync("api/activities/1", updateActivity);
 
             // Assert
 
