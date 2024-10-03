@@ -210,14 +210,15 @@ namespace Cognita_Infrastructure.Data
                 e.Email = f.Person.Email;
                 e.UserName = e.Email;
                 e.Name = f.Person.FullName;
+                e.Courses = [f.PickRandom(courses)];
             });
 
             var users = faker.Generate(numberOfUsers);
 
-            foreach(ApplicationUser user in users) {
-                int randomCourse = _random.Next(1, courses.Count());
-                user.Courses = [courses.ElementAt(randomCourse)];
-            }
+            //foreach(ApplicationUser user in users) {
+            //    int randomCourse = _random.Next(1, courses.Count());
+            //    user.Courses = [courses.ElementAt(randomCourse)];
+            //}
 
             double numberOfTeachers = Math.Ceiling((double)users.Count / 5);
 
@@ -239,6 +240,27 @@ namespace Cognita_Infrastructure.Data
                 }
                 i++;
             }
+
+            var testStudent = new ApplicationUser() {
+                Name = "Student Studentdotter",
+                Email = "student@test.se",
+                UserName = "student@test.se",
+                Courses = [courses.First()]
+            };
+
+            var testTeacher = new ApplicationUser()
+            {
+                Name = "Teacher Teacherson",
+                Email = "teacher@test.se",
+                UserName = "teacher@test.se",
+                Courses = [courses.First()]
+            };
+
+            await _userManager.CreateAsync(testStudent, passWord);
+            await _userManager.CreateAsync(testTeacher, passWord);
+
+            await _userManager.AddToRoleAsync(testStudent, USER_ROLE);
+            await _userManager.AddToRoleAsync(testTeacher, ADMIN_ROLE);
         }
     }
 }
