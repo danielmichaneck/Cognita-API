@@ -139,11 +139,9 @@ namespace Cognita_Tests
                 Email = "Updated email"
             };
 
-            var dtoAsJson = JsonConvert.SerializeObject(dto);
-
             // Act
 
-            var response = await _httpClient.PutAsJsonAsync("api/users/1", dtoAsJson);
+            var response = await _httpClient.PutAsJsonAsync("api/users/1", dto);
 
             if (response.IsSuccessStatusCode)
                 success = true;

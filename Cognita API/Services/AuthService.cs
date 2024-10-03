@@ -245,8 +245,10 @@ public class AuthService : IAuthService
         var user = await _userManager.FindByIdAsync(id.ToString());
         if (user is null) return false;
         _mapper.Map(dto, user);
-        //user.UserName = dto.Email;
-        //await _userManager.UpdateAsync(user);
+        user.UserName = dto.Email;
+        user.NormalizedUserName = dto.Email.Normalize();
+        user.NormalizedEmail = dto.Email.Normalize();
+        await _userManager.UpdateAsync(user);
         return true;
     }
 

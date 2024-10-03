@@ -50,6 +50,7 @@ namespace Cognita_Tests
 
             try {
                 await _userManager.CreateAsync(user, USER_SEED_PASSWORD);
+                await _userManager.AddToRoleAsync(user, "User");
             }
             catch (Exception ex) {
                 return;
