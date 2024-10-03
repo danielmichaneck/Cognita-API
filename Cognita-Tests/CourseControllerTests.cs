@@ -23,40 +23,11 @@ namespace Cognita_Tests
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly TestUtil _util;
 
-        const string baseHttpAddress = "https://localhost:7147/api/";
-
         public CourseControllerTests(CustomWebApplicationFactory applicationFactory) {
             _httpClient = applicationFactory.CreateClient();
             _context = applicationFactory.Context;
             _userManager = applicationFactory.UserManager;
             _util = new TestUtil(_userManager, _httpClient);
-        }
-
-        [Fact]
-        public async Task Get_All_Courses_Test_Success() {
-            // Arrange
-
-            TokenDto token = await _util.LogInTestStudentAsync();
-            bool success = false;
-
-            // Act
-
-            using (var requestMessage = new HttpRequestMessage(HttpMethod.Get, "api/courses"))
-            {
-                requestMessage.Headers.Authorization =
-                    new AuthenticationHeaderValue("Bearer", token.AccessToken);
-
-                var requestResult = await _httpClient.SendAsync(requestMessage);
-
-                if (requestResult.IsSuccessStatusCode)
-                {
-                    success = true;
-                }
-            }
-
-            // Assert
-
-            Assert.True(success);
         }
 
         [Fact]
@@ -70,11 +41,27 @@ namespace Cognita_Tests
         }
 
         [Fact]
-        public async Task Get_All_Courses_Success_Test()
+        public async Task Get_All_Courses_As_Student_Success_Test()
         {
             // Arrange
 
             TokenDto token = await _util.LogInTestStudentAsync();
+
+            // Act
+
+            _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token.AccessToken);
+            var requestResult = await _httpClient.GetAsync("api/courses");
+
+            // Assert
+            Assert.True(requestResult.IsSuccessStatusCode);
+        }
+
+        [Fact]
+        public async Task Get_All_Courses_As_Teacher_Success_Test()
+        {
+            // Arrange
+
+            TokenDto token = await _util.LogInTestTeacherAsync();
 
             // Act
 

@@ -111,7 +111,7 @@ namespace Cognita_Tests
 
             bool success = false;
 
-            using (var requestMessage = new HttpRequestMessage(HttpMethod.Get, "api/courses")) {
+            using (var requestMessage = new HttpRequestMessage(HttpMethod.Get, "api/courses/1")) {
                 requestMessage.Headers.Authorization =
                     new AuthenticationHeaderValue("Bearer", token.AccessToken);
 
