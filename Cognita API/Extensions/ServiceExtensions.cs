@@ -66,6 +66,7 @@ public static class ServiceExtensions
         services.AddScoped<IServiceManager, ServiceManager>();
         services.AddScoped<ICourseService, CourseService>();
         services.AddScoped<IModuleService, ModuleService>();
+        services.AddScoped<IActivityService, ActivityService>();
         services.AddScoped<IUserService, UserService>();
         services.AddScoped<IAuthService, AuthService>();
 
@@ -78,6 +79,9 @@ public static class ServiceExtensions
         services.AddScoped(provider => new Lazy<IModuleService>(
             () => provider.GetRequiredService<IModuleService>()
         ));
+        services.AddScoped(provider => new Lazy<IActivityService>(
+            () => provider.GetRequiredService<IActivityService>()
+        ));
         services.AddScoped(provider => new Lazy<IUserService>(
             () => provider.GetRequiredService<IUserService>()
         ));
@@ -88,12 +92,16 @@ public static class ServiceExtensions
         services.AddScoped<IUoW, UoW>();
         services.AddScoped<ICourseRepository, CourseRepository>();
         services.AddScoped<IModuleRepository, ModuleRepository>();
+        services.AddScoped<IActivityRepository, ActivityRepository>();
         services.AddScoped<IUserRepository, UserRepository>();
         services.AddScoped(provider => new Lazy<ICourseRepository>(
             () => provider.GetRequiredService<ICourseRepository>()
         ));
         services.AddScoped(provider => new Lazy<IModuleRepository>(
             () => provider.GetRequiredService<IModuleRepository>()
+        ));
+        services.AddScoped(provider => new Lazy<IActivityRepository>(
+            () => provider.GetRequiredService<IActivityRepository>()
         ));
         services.AddScoped(provider => new Lazy<IUserRepository>(
             () => provider.GetRequiredService<IUserRepository>()

@@ -59,4 +59,9 @@ public class ModuleService : IModuleService
         var module = await _uow.ModuleRepository.GetSingleModuleAsync(id);
         return _mapper.Map<ModuleDto>(module);
     }
+
+    public async void AddActivityToModule(Activity activity, int id) {
+        var module = await _uow.ModuleRepository.GetSingleModuleAsync(id, trackChanges: true);
+        module.Activities.Add(activity);
+    }
 }
