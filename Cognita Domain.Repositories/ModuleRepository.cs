@@ -30,6 +30,6 @@ public class ModuleRepository : RepositoryBase<Module>, IModuleRepository
     public async Task<IEnumerable<Module>> GetAllModulesAsync(int courseId) =>
         await GetByCondition(m => m.CourseId == courseId).ToListAsync();
 
-    public async Task<Module?> GetSingleModuleAsync(int id, bool trackChanges) =>
-        await GetByCondition(m => m.ModuleId == id, trackChanges).FirstOrDefaultAsync();
+    public async Task<Module?> GetSingleModuleAsync(int id, bool trackChanges = false) =>
+        await GetByCondition(m => m.ModuleId == id, trackChanges).Include(m => m.Activities).FirstOrDefaultAsync();
 }
