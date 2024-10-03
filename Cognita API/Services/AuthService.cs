@@ -1,19 +1,17 @@
-﻿using System.Collections.Generic;
-using System.IdentityModel.Tokens.Jwt;
+﻿using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Security.Cryptography;
 using System.Text;
 using AutoMapper;
 using Cognita.API.Service.Contracts;
+using Cognita_Infrastructure.Data;
 using Cognita_Infrastructure.Models.Dtos;
 using Cognita_Infrastructure.Models.Entities;
 using Cognita_Service.Contracts;
 using Cognita_Shared.Dtos.User;
-using Cognita_Shared.Entities;
 using Cognita_Shared.Enums;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Query;
 using Microsoft.IdentityModel.Tokens;
 
 namespace Cognita.API.Services;
@@ -25,6 +23,7 @@ public class AuthService : IAuthService
     private readonly IConfiguration _configuration;
     private readonly IMapper _mapper;
     private readonly ICourseService _courseService;
+    private readonly CognitaDbContext _context;
     private ApplicationUser? _user;
 
     public AuthService(
@@ -32,7 +31,8 @@ public class AuthService : IAuthService
         RoleManager<IdentityRole<int>> roleManager,
         IConfiguration configuration,
         IMapper mapper,
-        ICourseService courseService
+        ICourseService courseService,
+        CognitaDbContext context
     )
     {
         _userManager = userManager;
@@ -40,6 +40,7 @@ public class AuthService : IAuthService
         _configuration = configuration;
         _mapper = mapper;
         _courseService = courseService;
+        _context = context;
     }
 
     /// <summary>
@@ -249,6 +250,7 @@ public class AuthService : IAuthService
         user.NormalizedUserName = dto.Email.Normalize();
         user.NormalizedEmail = dto.Email.Normalize();
         await _userManager.UpdateAsync(user);
+        await _context.SaveChangesAsync();
         return true;
     }
 
