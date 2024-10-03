@@ -13,6 +13,7 @@ using Cognita_Shared.Entities;
 using Cognita_Shared.Enums;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Query;
 using Microsoft.IdentityModel.Tokens;
 
 namespace Cognita.API.Services;
@@ -226,35 +227,18 @@ public class AuthService : IAuthService
     }
 
     public async Task<IEnumerable<UserDto>> GetUsersAsync(int? courseId = null) {
-        var users = _userManager.Users.Include(u => u.Courses);
+        var users = await _userManager.Users.Include(u => u.Courses).ToListAsync();
         var userDtos = new List<UserDto>();
-        if (courseId is null) { 
-            foreach (ApplicationUser user in users) {
-                var userDto = _mapper.Map<UserDto>(user);
-                if (user.Courses is null) throw new NullReferenceException("User courses is null");
-                var course = user.Courses.FirstOrDefault();
-                if (course is null) throw new ArgumentException("A user has null or default courses.");
-                userDto.CourseName = course.CourseName;
-                userDtos.Add(userDto);
-            }
-            return userDtos;
+        if (courseId is null) {
+            return await CreateUserDtos(users);
         }
 
-        var courseUsers = await users.Where(u => u.Courses
-                                        .Where(c => c.CourseId == courseId)
-                                        .Any())
-                                     .ToListAsync();
+        var courseUsers = users.Where(u => u.Courses
+                                .Where(c => c.CourseId == courseId)
+                                .Any())
+                               .ToList();
 
-        foreach (ApplicationUser user in users) {
-            var userDto = _mapper.Map<UserDto>(user);
-            if (user.Courses is null) throw new NullReferenceException("User courses is null");
-            var course = user.Courses.FirstOrDefault();
-            if (course is null) throw new ArgumentException("A user has null or default courses.");
-            userDto.CourseName = course.CourseName;
-            userDtos.Add(userDto);
-        }
-
-        return userDtos;
+        return await CreateUserDtos(courseUsers);
     }
 
     public async Task<bool> UpdateUser(int id, UserForUpdateDto dto) {
@@ -264,5 +248,38 @@ public class AuthService : IAuthService
         //user.UserName = dto.Email;
         //await _userManager.UpdateAsync(user);
         return true;
+    }
+
+    private async Task<List<UserDto>> CreateUserDtos(List<ApplicationUser> users)
+    {
+        var userDtos = new List<UserDto>();
+        foreach (ApplicationUser user in users)
+        {
+            if (user.Courses is null) throw new NullReferenceException("User courses is null");
+            var userDto = _mapper.Map<UserDto>(user);
+            var course = user.Courses.FirstOrDefault();
+            if (course is null) throw new ArgumentException("A user has null or default courses.");
+            userDto.CourseName = course.CourseName;
+            userDto.CourseId = course.CourseId;
+            userDto.Role = await GetRoleAsync(user);
+            userDtos.Add(userDto);
+        }
+        return userDtos;
+    }
+
+    private async Task<UserRole> GetRoleAsync(ApplicationUser user)
+    {
+        var roles = await _userManager.GetRolesAsync(user);
+        switch (roles.FirstOrDefault())
+        {
+            case "Admin":
+                return UserRole.Teacher;
+
+            case "User":
+                return UserRole.Student;
+
+            default:
+                throw new ArgumentException("The user does not have a valid role.");
+        }
     }
 }

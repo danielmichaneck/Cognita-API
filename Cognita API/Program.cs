@@ -1,5 +1,5 @@
 using Cognita.API.Extensions;
-using Cognita_API.Infrastructure.Data;
+using Cognita_Infrastructure.Data;
 using Cognita_Infrastructure.Models.Entities;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;

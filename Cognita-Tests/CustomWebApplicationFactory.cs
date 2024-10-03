@@ -1,6 +1,6 @@
 ﻿using Bogus.Extensions.UnitedKingdom;
 using Cognita_API;
-using Cognita_API.Infrastructure.Data;
+using Cognita_Infrastructure.Data;
 using Cognita_Infrastructure.Models.Entities;
 using Cognita_Shared.Entities;
 using Cognita_Shared.Enums;

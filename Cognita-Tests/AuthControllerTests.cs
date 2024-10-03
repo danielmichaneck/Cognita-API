@@ -1,6 +1,5 @@
 ﻿using System.Net.Http.Json;
 using IntegrationTests;
-using Cognita_API.Infrastructure.Data;
 using System.Net;
 using Cognita_Infrastructure.Models.Dtos;
 using Microsoft.AspNetCore.Identity;
@@ -9,6 +8,7 @@ using System.Net.Http.Headers;
 using System.IdentityModel.Tokens.Jwt;
 using Cognita_Shared.Enums;
 using Cognita_Shared.Dtos.User;
+using Cognita_Infrastructure.Data;
 
 namespace Cognita_Tests
 {

@@ -1,7 +1,6 @@
 ﻿using System.Text;
 using Cognita.API.Service.Contracts;
 using Cognita.API.Services;
-using Cognita_API.Infrastructure.Data;
 using Cognita_Domain.Contracts;
 using Cognita_Domain.Repositories;
 using Cognita_Infrastructure.Data;
