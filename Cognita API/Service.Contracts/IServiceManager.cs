@@ -10,5 +10,7 @@ public interface IServiceManager
 
     IModuleService ModuleService { get; }
 
+    IActivityService ActivityService { get; }
+
     IUserService UserService { get; }
 }
