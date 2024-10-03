@@ -1,11 +1,13 @@
 ﻿using Cognita.API.Service.Contracts;
 using Cognita_Shared.Dtos.Module;
 using Cognita_Shared.Dtos.User;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Swashbuckle.AspNetCore.Annotations;
 
 namespace Cognita_API.Controllers
 {
+    [Authorize]
     [Route("api/")]
     [ApiController]
     public class UserController : ControllerBase
@@ -31,7 +33,8 @@ namespace Cognita_API.Controllers
         {
             var users = await _serviceManager.AuthService.GetUsersAsync(id);
 
-            if (users is null) {
+            if (users is null)
+            {
                 return NotFound();
             }
 
@@ -52,7 +55,8 @@ namespace Cognita_API.Controllers
         {
             var users = await _serviceManager.AuthService.GetUsersAsync();
 
-            if (users is null) {
+            if (users is null)
+            {
                 return NotFound();
             }
 
@@ -72,7 +76,8 @@ namespace Cognita_API.Controllers
         public async Task<ActionResult> UpdateUser(int id, UserForUpdateDto dto)
         {
             var result = await _serviceManager.AuthService.UpdateUser(id, dto);
-            if (!result) {
+            if (!result)
+            {
                 return NotFound();
             }
 
