@@ -2,12 +2,15 @@ using Cognita_Infrastructure.Data;
 using Cognita_Infrastructure.Models.Dtos;
 using Cognita_Infrastructure.Models.Entities;
 using Cognita_Shared.Dtos.Course;
+using Humanizer;
 using IntegrationTests;
 using Microsoft.AspNetCore.Identity;
 using Newtonsoft.Json;
+using NuGet.Common;
 using System.Net;
 using System.Net.Http.Headers;
 using System.Net.Http.Json;
+using System.Text;
 
 namespace Cognita_Tests
 {
@@ -69,24 +72,39 @@ namespace Cognita_Tests
         [Fact]
         public async Task Get_Course_Success_Test()
         {
+            // Arrange
+
+            TokenDto token = await _util.LogInTestUserAsync();
+
             // Act
-            var response = await _httpClient.GetAsync("api/courses/1");
+
+            _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token.AccessToken);
+            var requestResult = await _httpClient.GetAsync("api/courses/1");
 
             // Assert
-            Assert.True(response.StatusCode == HttpStatusCode.OK);
+            Assert.True(requestResult.IsSuccessStatusCode);
         }
 
         [Fact]
         public async Task Get_Course_With_Details_Success_Test()
         {
-            // Act
-            var response = await _httpClient.GetAsync("api/courses/1");
+            // Arrange
 
-            var courseAsJsonString = await response.Content.ReadAsStringAsync();
+            TokenDto token = await _util.LogInTestUserAsync();
+
+            // Act
+
+            _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token.AccessToken);
+            var requestResult = await _httpClient.GetAsync("api/courses");
+
+            Assert.True(requestResult.IsSuccessStatusCode);
+
+            var courseAsJsonString = await requestResult.Content.ReadAsStringAsync();
 
             var course = JsonConvert.DeserializeObject<CourseWithDetailsDto>(courseAsJsonString);
 
             // Assert
+
             Assert.True(course is CourseWithDetailsDto);
 
             var activityType = course.Modules
@@ -101,6 +119,8 @@ namespace Cognita_Tests
         {
             // Arrange
 
+            TokenDto token = await _util.LogInTestUserAsync();
+
             var newCourse = new CourseForCreationDto()
             {
                 CourseName = "Test-course-1",
@@ -111,17 +131,20 @@ namespace Cognita_Tests
 
             // Act
 
-            var response = await _httpClient.PostAsJsonAsync("api/courses", newCourse);
+            _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token.AccessToken);
+            var requestResult = await _httpClient.PostAsJsonAsync("api/courses", newCourse);
 
             // Assert
 
-            Assert.True(response.IsSuccessStatusCode);
+            Assert.True(requestResult.IsSuccessStatusCode);
         }
 
         [Fact]
         public async Task Edit_Course_Success_Test()
         {
             // Arrange
+
+            TokenDto token = await _util.LogInTestUserAsync();
 
             var newCourse = new CourseForUpdateDto()
             {
@@ -133,11 +156,12 @@ namespace Cognita_Tests
 
             // Act
 
-            var response = await _httpClient.PutAsJsonAsync("api/courses/1", newCourse);
+            _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token.AccessToken);
+            var requestResult = await _httpClient.PutAsJsonAsync("api/courses/1", newCourse);
 
             // Assert
 
-            Assert.True(response.IsSuccessStatusCode);
+            Assert.True(requestResult.IsSuccessStatusCode);
         }
     }
 }
