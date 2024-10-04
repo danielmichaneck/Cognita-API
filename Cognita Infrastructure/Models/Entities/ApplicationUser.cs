@@ -9,7 +9,10 @@ public class ApplicationUser : IdentityUser<int>
     public DateTime RefreshTokenExpireTime { get; set; }
     public required string Name { get; set; }
 
+    // Foreign key
+    public int FilesId { get; set; }
+
     // Navigation property
     public ICollection<Course> Courses { get; set; }
-    public ICollection<Document> Documents { get; set; }
+    public DocumentHolder Files { get; set; }
 }

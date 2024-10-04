@@ -7,5 +7,4 @@ public class UserForUpdateDto
     public required string Name { get; set; }
     public required string Email { get; set; }
     public int CourseId { get; set; }
-    //TODO Email?
 }

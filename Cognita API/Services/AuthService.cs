@@ -9,7 +9,9 @@ using Cognita_Infrastructure.Models.Dtos;
 using Cognita_Infrastructure.Models.Entities;
 using Cognita_Service.Contracts;
 using Cognita_Shared.Dtos.Course;
+using Cognita_Shared.Dtos.Document;
 using Cognita_Shared.Dtos.User;
+using Cognita_Shared.Entities;
 using Cognita_Shared.Enums;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -277,6 +279,16 @@ public class AuthService : IAuthService
         user.NormalizedEmail = dto.Email.Normalize();
         await _userManager.UpdateAsync(user);
         await _context.SaveChangesAsync();
+        return true;
+    }
+
+    public async Task<bool> AddDocumentToUser(int id, DocumentDto documentDto)
+    {
+        var user = await _userManager.FindByIdAsync(id.ToString());
+        if (user is null) return false;
+        var document = _mapper.Map<Document>(documentDto);
+        if (document is null) return false;
+        user.Files.Docs.Add(document);
         return true;
     }
 

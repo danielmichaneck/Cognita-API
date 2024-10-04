@@ -18,26 +18,26 @@ namespace Cognita_Infrastructure.Data
             base.OnModelCreating(modelBuilder);
 
             modelBuilder.Entity<ApplicationUser>()
+                .Property("Email").IsRequired();
+
+            modelBuilder.Entity<ApplicationUser>()
                 .HasMany(u => u.Courses)
                 .WithMany();
 
             modelBuilder.Entity<ApplicationUser>()
-                .Property("Email").IsRequired();
-
-            modelBuilder.Entity<ApplicationUser>()
-                .HasMany(u => u.Documents)
-                .WithOne();
+                .HasOne(u => u.Files);
 
             modelBuilder.Entity<Course>()
-                .HasOne(c => c.Files)
-                .WithOne();
+                .HasOne(c => c.Files);
 
             modelBuilder.Entity<Module>()
-                .HasOne(c => c.Files)
-                .WithOne();
+                .HasOne(c => c.Files);
 
             modelBuilder.Entity<Activity>()
-                .HasOne(c => c.Files)
+                .HasOne(c => c.Files);
+
+            modelBuilder.Entity<DocumentHolder>()
+                .HasMany(dh => dh.Docs)
                 .WithOne();
         }
     }

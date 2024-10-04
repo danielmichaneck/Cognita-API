@@ -72,10 +72,8 @@ namespace Cognita_Infrastructure.Data
         private static IEnumerable<ActivityType> GenerateActivityTypes(string[] activityTypeArray)
         {
             List<ActivityType> activityTypes = new List<ActivityType>();
-            foreach (string activityType in activityTypeArray)
-            {
+            foreach (string activityType in activityTypeArray) {
                 activityTypes.Add(new ActivityType { Title = activityType });
-                ;
             }
             return activityTypes;
         }
@@ -87,8 +85,7 @@ namespace Cognita_Infrastructure.Data
         {
             var activities = new List<Activity>(nrOfActivities);
 
-            for (int i = 0; i < nrOfActivities; i++)
-            {
+            for (int i = 0; i < nrOfActivities; i++) {
                 var randomDate = _faker.Date.Future(1, DateTime.Now);
                 var randomDayIncrement = _random.Next(1, 10);
                 var randomHourIncrement = _random.Next(1, 15);
@@ -101,13 +98,15 @@ namespace Cognita_Infrastructure.Data
                 );
                 var type = _faker.PickRandom(activityTypes);
 
-                var activity = new Activity()
-                {
+                var activity = new Activity() {
                     ActivityName = name,
                     Description = description,
                     StartDate = startDate,
                     EndDate = endDate,
-                    ActivityType = type
+                    ActivityType = type,
+                    Files = new DocumentHolder() {
+                        Docs = []
+                    }
                 };
 
                 activities.Add(activity);
@@ -125,8 +124,7 @@ namespace Cognita_Infrastructure.Data
             var activityArray = activities.ToArray();
             int activityIndex = 0;
 
-            for (int i = 0; i < nrOfModules; i++)
-            {
+            for (int i = 0; i < nrOfModules; i++) {
                 var slicedPosts = activityArray.Skip(activityIndex).Take(2);
 
                 var randomDate = _faker.Date.Future(1, DateTime.Now);
@@ -139,13 +137,15 @@ namespace Cognita_Infrastructure.Data
                     randomDate.Add(new TimeSpan(randomDayIncrement, 0, 0, 0))
                 );
 
-                var module = new Module()
-                {
+                var module = new Module() {
                     ModuleName = name,
                     Description = description,
                     StartDate = startDate,
                     EndDate = endDate,
-                    Activities = slicedPosts.ToList()
+                    Activities = slicedPosts.ToList(),
+                    Files = new DocumentHolder() {
+                        Docs = []
+                    }
                 };
 
                 modules.Add(module);
@@ -164,8 +164,7 @@ namespace Cognita_Infrastructure.Data
             var moduleArray = modules.ToArray();
             int moduleIndex = 0;
 
-            for (int i = 0; i < nrOfCourses; i++)
-            {
+            for (int i = 0; i < nrOfCourses; i++) {
                 var slicedPosts = moduleArray.Skip(moduleIndex).Take(2);
 
                 var randomDate = _faker.Date.Future(1, DateTime.Now);
@@ -184,7 +183,10 @@ namespace Cognita_Infrastructure.Data
                     Description = description,
                     StartDate = startDate,
                     EndDate = endDate,
-                    Modules = slicedPosts.ToList()
+                    Modules = slicedPosts.ToList(),
+                    Files = new DocumentHolder() {
+                        Docs = []
+                    }
                 };
 
                 courses.Add(course);
@@ -195,8 +197,7 @@ namespace Cognita_Infrastructure.Data
 
         private static async Task CreateRolesAsync(string[] roleNames)
         {
-            foreach (var roleName in roleNames)
-            {
+            foreach (var roleName in roleNames) { 
                 if (await _roleManager.RoleExistsAsync(roleName)) continue;
                 var Role = new IdentityRole<int> { Name = roleName };
                 var result = await _roleManager.CreateAsync(Role);
@@ -211,6 +212,9 @@ namespace Cognita_Infrastructure.Data
                 e.UserName = e.Email;
                 e.Name = f.Person.FullName;
                 e.Courses = [f.PickRandom(courses)];
+                e.Files = new DocumentHolder() {
+                    Docs = []
+                };
             });
 
             var users = faker.Generate(numberOfUsers);
@@ -245,7 +249,10 @@ namespace Cognita_Infrastructure.Data
                 Name = "Student Studentdotter",
                 Email = "student@test.se",
                 UserName = "student@test.se",
-                Courses = [courses.First()]
+                Courses = [courses.First()],
+                Files = new DocumentHolder() {
+                    Docs = []
+                }
             };
 
             var testTeacher = new ApplicationUser()
@@ -253,7 +260,10 @@ namespace Cognita_Infrastructure.Data
                 Name = "Teacher Teacherson",
                 Email = "teacher@test.se",
                 UserName = "teacher@test.se",
-                Courses = [courses.First()]
+                Courses = [courses.First()],
+                Files = new DocumentHolder() {
+                    Docs = []
+                }
             };
 
             await _userManager.CreateAsync(testStudent, passWord);

@@ -9,6 +9,8 @@ namespace Cognita_Shared.Entities
     public class DocumentHolder
     {
         public int DocumentHolderId { get; set; }
+
+        // Navigation property
         public ICollection<Document> Docs { get; set; }
     }
 }

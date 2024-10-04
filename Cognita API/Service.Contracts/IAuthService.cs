@@ -1,5 +1,6 @@
 ﻿using Cognita_Infrastructure.Models.Dtos;
 using Cognita_Shared.Dtos.Course;
+using Cognita_Shared.Dtos.Document;
 using Cognita_Shared.Dtos.User;
 using Microsoft.AspNetCore.Identity;
 
@@ -15,4 +16,5 @@ public interface IAuthService
     public Task<IEnumerable<UserDto>> GetUsersAsync(int? courseId = null);
     public Task<bool> UpdateUser(int id, UserForUpdateDto dto);
     public Task<IEnumerable<CourseDto>> GetCoursesForUserAsync(int userId);
+    public Task<bool> AddDocumentToUser(int id, DocumentDto documentDto);
 }
