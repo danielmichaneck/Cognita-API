@@ -64,6 +64,7 @@ namespace Cognita_API.Controllers
         }
 
         [HttpPut("users/{id}")]
+        [Authorize(Roles = "Admin")]
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(UserDto))]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [SwaggerOperation(

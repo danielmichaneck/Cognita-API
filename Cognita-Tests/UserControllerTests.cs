@@ -132,7 +132,7 @@ namespace Cognita_Tests
         {
             // Arrange
 
-            TokenDto token = await _util.LogInTestStudentAsync();
+            TokenDto token = await _util.LogInTestTeacherAsync();
             bool success = false;
 
             var dto = new UserForUpdateDto() {

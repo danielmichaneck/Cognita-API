@@ -58,7 +58,7 @@ namespace Cognita_Tests {
 
             // Arrange
 
-            TokenDto token = await _util.LogInTestStudentAsync();
+            TokenDto token = await _util.LogInTestTeacherAsync();
 
             var newActivity = new ActivityForCreationDto()
             {
@@ -84,7 +84,7 @@ namespace Cognita_Tests {
         {
             // Arrange
 
-            TokenDto token = await _util.LogInTestStudentAsync();
+            TokenDto token = await _util.LogInTestTeacherAsync();
 
             var updateActivity = new ActivityForCreationDto()
             {

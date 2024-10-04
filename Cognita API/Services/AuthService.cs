@@ -8,6 +8,7 @@ using Cognita_Infrastructure.Data;
 using Cognita_Infrastructure.Models.Dtos;
 using Cognita_Infrastructure.Models.Entities;
 using Cognita_Service.Contracts;
+using Cognita_Shared.Dtos.Course;
 using Cognita_Shared.Dtos.User;
 using Cognita_Shared.Enums;
 using Microsoft.AspNetCore.Identity;
@@ -106,6 +107,7 @@ public class AuthService : IAuthService
 
         List<Claim> claims;
 
+        // Needed to customize claims.
         switch (await GetRoleAsync(_user)) {
             case UserRole.Teacher:
                 claims = new List<Claim>() {
@@ -253,6 +255,14 @@ public class AuthService : IAuthService
                                .ToList();
 
         return await CreateUserDtos(courseUsers);
+    }
+
+    public async Task<IEnumerable<CourseDto>> GetCoursesForUserAsync(int userId)
+    {
+        var user = await _context.Users.Where(u => u.Id == userId).Include(u => u.Courses).FirstOrDefaultAsync() ??
+            throw new NullReferenceException("User is null.");
+
+        return _mapper.Map<IEnumerable<CourseDto>>(user.Courses);
     }
 
     public async Task<bool> UpdateUser(int id, UserForUpdateDto dto) {

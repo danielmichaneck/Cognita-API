@@ -1,8 +1,10 @@
 using Cognita.API.Service.Contracts;
 using Cognita_Shared.Dtos.Course;
+using Cognita_Shared.Enums;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Swashbuckle.AspNetCore.Annotations;
+using System.Security.Claims;
 
 namespace Cognita_API.Controllers
 {
@@ -18,7 +20,7 @@ namespace Cognita_API.Controllers
             _serviceManager = serviceManager;
         }
 
-        // GET: api/Courses/
+        // GET: api/Courses
         [HttpGet]
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(CourseDto))]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -31,14 +33,46 @@ namespace Cognita_API.Controllers
         [SwaggerResponse(StatusCodes.Status404NotFound, "No courses found")]
         public async Task<ActionResult<IEnumerable<CourseDto>>> GetAllCourses()
         {
-            var courses = await _serviceManager.CourseService.GetCoursesAsync();
+            // HttpContext is given to the API when the call is made.
+            if (HttpContext.User.Identity is ClaimsIdentity identity) {
 
-            if (courses == null)
-            {
-                return NotFound();
+                UserRole? role = null;
+                int id = 0;
+                bool idSet = false;
+
+                List<Claim> claims = identity.Claims.ToList();
+
+                foreach (Claim claim in claims) {
+                    if (claim.Type == ClaimTypes.Role) {
+                        if (claim.Value == "Admin") {
+                            role = UserRole.Teacher;
+                        }
+                        else if (claim.Value == "User") {
+                            role = UserRole.Student;
+                        }
+                    }
+                    else if (claim.Type == ClaimTypes.NameIdentifier) {
+                        id = int.Parse(claim.Value);
+                        idSet = true;
+                    }
+                }
+
+                if (role is not null && idSet) {
+
+                    var courses = (role == UserRole.Teacher) ?
+                        await _serviceManager.CourseService.GetCoursesAsync() :
+                        await _serviceManager.AuthService.GetCoursesForUserAsync(id);
+
+                    if (courses == null)
+                    {
+                        return NotFound();
+                    }
+
+                    return Ok(courses);
+                }
             }
 
-            return Ok(courses);
+            return BadRequest();
         }
 
         // GET: api/Courses/5
@@ -66,6 +100,7 @@ namespace Cognita_API.Controllers
         // PUT: api/Courses/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id}")]
+        [Authorize(Roles = "Admin")]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -98,6 +133,7 @@ namespace Cognita_API.Controllers
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
 
         [HttpPost]
+        [Authorize(Roles = "Admin")]
         [ProducesResponseType(StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [SwaggerOperation(

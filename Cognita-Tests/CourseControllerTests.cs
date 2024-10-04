@@ -98,6 +98,9 @@ namespace Cognita_Tests
             // Act
 
             _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token.AccessToken);
+
+            // Assert
+
             var requestResult = await _httpClient.GetAsync("api/courses/1");
 
             Assert.True(requestResult.IsSuccessStatusCode);
@@ -105,8 +108,6 @@ namespace Cognita_Tests
             var courseAsJsonString = await requestResult.Content.ReadAsStringAsync();
 
             var course = JsonConvert.DeserializeObject<CourseWithDetailsDto>(courseAsJsonString);
-
-            // Assert
 
             Assert.True(course is CourseWithDetailsDto);
 
@@ -122,7 +123,7 @@ namespace Cognita_Tests
         {
             // Arrange
 
-            TokenDto token = await _util.LogInTestStudentAsync();
+            TokenDto token = await _util.LogInTestTeacherAsync();
 
             var newCourse = new CourseForCreationDto()
             {
@@ -147,7 +148,7 @@ namespace Cognita_Tests
         {
             // Arrange
 
-            TokenDto token = await _util.LogInTestStudentAsync();
+            TokenDto token = await _util.LogInTestTeacherAsync();
 
             var newCourse = new CourseForUpdateDto()
             {
