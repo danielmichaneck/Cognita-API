@@ -11,6 +11,7 @@ using Cognita_Shared.Dtos.Course;
 using Newtonsoft.Json;
 using System.Text.Json;
 using Cognita_Infrastructure.Data;
+using System.Text;
 
 namespace Cognita_Tests
 {
@@ -39,7 +40,7 @@ namespace Cognita_Tests
         {
             // Arrange
 
-            TokenDto token = await _util.LogInTestUserAsync();
+            TokenDto token = await _util.LogInTestTeacherAsync();
             bool success = false;
 
             // Act
@@ -67,7 +68,7 @@ namespace Cognita_Tests
         {
             // Arrange
 
-            TokenDto token = await _util.LogInTestUserAsync();
+            TokenDto token = await _util.LogInTestTeacherAsync();
             bool success = false;
             IEnumerable<UserDto>? dtos;
 
@@ -103,7 +104,7 @@ namespace Cognita_Tests
         {
             // Arrange
 
-            TokenDto token = await _util.LogInTestUserAsync();
+            TokenDto token = await _util.LogInTestStudentAsync();
             bool success = false;
 
             // Act
@@ -131,7 +132,7 @@ namespace Cognita_Tests
         {
             // Arrange
 
-            TokenDto token = await _util.LogInTestUserAsync();
+            TokenDto token = await _util.LogInTestTeacherAsync();
             bool success = false;
 
             var dto = new UserForUpdateDto() {
@@ -141,25 +142,13 @@ namespace Cognita_Tests
 
             // Act
 
-            var response = await _httpClient.PutAsJsonAsync("api/users/1", dto);
+            _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token.AccessToken);
+            var requestResult = await _httpClient.PutAsJsonAsync("api/users/1", dto);
 
-            if (response.IsSuccessStatusCode)
+            if (requestResult.IsSuccessStatusCode)
+            {
                 success = true;
-
-            //using (var requestMessage = new HttpRequestMessage(HttpMethod.Put, "api/users/1"))
-            //{
-            //    requestMessage.Headers.Authorization =
-            //        new AuthenticationHeaderValue("Bearer", token.AccessToken);
-
-            //    requestMessage.Content = new StringContent(dtoAsJson);
-
-            //    var requestResult = await _httpClient.SendAsync(requestMessage);
-
-            //    if (requestResult.IsSuccessStatusCode)
-            //    {
-            //        success = true;
-            //    }
-            //}
+            }
 
             // Assert
 

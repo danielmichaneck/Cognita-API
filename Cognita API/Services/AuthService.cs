@@ -8,6 +8,7 @@ using Cognita_Infrastructure.Data;
 using Cognita_Infrastructure.Models.Dtos;
 using Cognita_Infrastructure.Models.Entities;
 using Cognita_Service.Contracts;
+using Cognita_Shared.Dtos.Course;
 using Cognita_Shared.Dtos.User;
 using Cognita_Shared.Enums;
 using Microsoft.AspNetCore.Identity;
@@ -56,7 +57,7 @@ public class AuthService : IAuthService
         var jwtSettings = _configuration.GetSection("JwtSettings");
 
         SigningCredentials signing = GetSigningCredentials();
-        IEnumerable<Claim> claims = GetClaims();
+        IEnumerable<Claim> claims = await GetClaims();
         JwtSecurityToken tokenOptions = GenerateTokenOptions(signing, claims, long.Parse(jwtSettings["accessTokenExpirationTime"]));
 
         ArgumentNullException.ThrowIfNull(_user, nameof(_user));
@@ -100,16 +101,30 @@ public class AuthService : IAuthService
         return tokenOptions;
     }
 
-    private IEnumerable<Claim> GetClaims()
+    private async Task<IEnumerable<Claim>> GetClaims()
     {
         ArgumentNullException.ThrowIfNull(_user);
 
-        var claims = new List<Claim>()
-        {
-            new Claim(ClaimTypes.Name, _user.UserName!),
-            new Claim(ClaimTypes.NameIdentifier, _user.Id.ToString()!)
-            //Add more if needed
-        };
+        List<Claim> claims;
+
+        // Needed to customize claims.
+        switch (await GetRoleAsync(_user)) {
+            case UserRole.Teacher:
+                claims = new List<Claim>() {
+                    new Claim(ClaimTypes.Name, _user.UserName!),
+                    new Claim(ClaimTypes.NameIdentifier, _user.Id.ToString()!),
+                    new Claim(ClaimTypes.Role, "Admin")
+                };
+                break;
+
+            default:
+                claims = new List<Claim>() {
+                    new Claim(ClaimTypes.Name, _user.UserName!),
+                    new Claim(ClaimTypes.NameIdentifier, _user.Id.ToString()!),
+                    new Claim(ClaimTypes.Role, "User")
+                };
+                break;
+        }
 
         return claims;
     }
@@ -240,6 +255,14 @@ public class AuthService : IAuthService
                                .ToList();
 
         return await CreateUserDtos(courseUsers);
+    }
+
+    public async Task<IEnumerable<CourseDto>> GetCoursesForUserAsync(int userId)
+    {
+        var user = await _context.Users.Where(u => u.Id == userId).Include(u => u.Courses).FirstOrDefaultAsync() ??
+            throw new NullReferenceException("User is null.");
+
+        return _mapper.Map<IEnumerable<CourseDto>>(user.Courses);
     }
 
     public async Task<bool> UpdateUser(int id, UserForUpdateDto dto) {

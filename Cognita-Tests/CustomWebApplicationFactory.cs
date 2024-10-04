@@ -1,10 +1,7 @@
-﻿using Bogus.Extensions.UnitedKingdom;
-using Cognita_API;
+﻿using Cognita_API;
 using Cognita_Infrastructure.Data;
 using Cognita_Infrastructure.Models.Entities;
 using Cognita_Shared.Entities;
-using Cognita_Shared.Enums;
-using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc.Testing;

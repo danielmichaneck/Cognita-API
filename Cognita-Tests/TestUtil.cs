@@ -3,6 +3,7 @@ using Cognita_Infrastructure.Models.Entities;
 using Cognita_Shared.Entities;
 using Cognita_Shared.Enums;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
 using System.Collections.ObjectModel;
 using System.Net.Http.Json;
@@ -11,16 +12,20 @@ namespace Cognita_Tests
 {
     internal class TestUtil
     {
-        private const string USER_SEED_NAME = "Kalle Anka";
-        private const string USER_SEED_EMAIL = "kalle@ankeborg.anka";
-        private const string USER_SEED_PASSWORD = "KallesPassword123!";
-        private const int USER_SEED_COURSE_ID = 1;
-        private const UserRole USER_SEED_ROLE = UserRole.Student;
+        private const string STUDENT_SEED_NAME = "Kalle Anka";
+        private const string TEACHER_SEED_NAME = "Pelle Svanslos";
+        private const string STUDENT_SEED_EMAIL = "kalle@ankeborg.anka";
+        private const string TEACHER_SEED_EMAIL = "pelle@svanslos.uppsala";
+        private const string STUDENT_SEED_PASSWORD = "KallesPassword123!";
+        private const string TEACHER_SEED_PASSWORD = "PellesPassword123!";
+        private const string STUDENT_SEED_ROLE = "User";
+        private const string TEACHER_SEED_ROLE = "Admin";
 
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly HttpClient _httpClient;
 
         private bool _userSeeded = false;
+        private Course? _seededCourse;
 
         public TestUtil(UserManager<ApplicationUser> userManager, HttpClient httpClient) {
             _userManager = userManager;
@@ -28,60 +33,100 @@ namespace Cognita_Tests
         }
 
         /// <summary>
-        /// Seeds test user based on constant if one does not exist.
+        /// Seeds test student and teacher based on constants if one does not exist.
         /// </summary>
         /// <returns></returns>
-        private async Task SeedTestUserAsync() {
+        private async Task SeedTestUsersAsync() {
             if (_userSeeded) return;
             _userSeeded = true;
 
-            var exists = await _userManager.FindByNameAsync(USER_SEED_EMAIL);
-            if (exists != null) return;
+            var teacherExists = await _userManager.FindByNameAsync(TEACHER_SEED_EMAIL);
 
-            var course = SeedCourse();
+            if (teacherExists is null) {
+                var course = SeedCourse();
 
-            var user = new ApplicationUser {
-                UserName = USER_SEED_EMAIL,
-                Email = USER_SEED_EMAIL,
-                Name = USER_SEED_NAME
-            };
+                var teacher = new ApplicationUser {
+                    UserName = TEACHER_SEED_EMAIL,
+                    Email = TEACHER_SEED_EMAIL,
+                    Name = TEACHER_SEED_NAME
+                };
 
-            user.Courses = [course];
+                teacher.Courses = [course];
 
-            try {
-                await _userManager.CreateAsync(user, USER_SEED_PASSWORD);
-                await _userManager.AddToRoleAsync(user, "User");
+                var createTeacherResult = await _userManager.CreateAsync(teacher, TEACHER_SEED_PASSWORD);
+                var roleTeacherResult = await _userManager.AddToRoleAsync(teacher, TEACHER_SEED_ROLE);
             }
-            catch (Exception ex) {
-                return;
+
+            var studentExists = await _userManager.FindByNameAsync(STUDENT_SEED_EMAIL);
+
+            if (studentExists is null) {
+                var course = SeedCourse();
+
+                var student = new ApplicationUser {
+                    UserName = STUDENT_SEED_EMAIL,
+                    Email = STUDENT_SEED_EMAIL,
+                    Name = STUDENT_SEED_NAME
+                };
+
+                student.Courses = [course];
+
+                var createStudentResult = await _userManager.CreateAsync(student, STUDENT_SEED_PASSWORD);
+                var roleStudentResult = await _userManager.AddToRoleAsync(student, STUDENT_SEED_ROLE);
             }
         }
 
         /// <summary>
-        /// Returns a dto for logging in a test user.
+        /// Returns a dto for logging in a test student.
         /// </summary>
         /// <returns></returns>
-        internal async Task<UserForAuthenticationDto> GetTestUserAuthenticationDtoAsync() {
-            await SeedTestUserAsync();
+        internal async Task<UserForAuthenticationDto> GetTestStudentAuthenticationDtoAsync() {
+            await SeedTestUsersAsync();
             return new UserForAuthenticationDto() {
-                UserName = USER_SEED_EMAIL,
-                Password = USER_SEED_PASSWORD
+                UserName = STUDENT_SEED_EMAIL,
+                Password = STUDENT_SEED_PASSWORD
             };
         }
 
         /// <summary>
-        /// Gets a Token for a logged in test user.
+        /// Returns a dto for logging in a test teacher.
         /// </summary>
         /// <returns></returns>
-        internal async Task<TokenDto> LogInTestUserAsync() {
-            await SeedTestUserAsync();
-            var baseResponse = await _httpClient.PostAsJsonAsync("api/authentication/login", await GetTestUserAuthenticationDtoAsync());
+        internal async Task<UserForAuthenticationDto> GetTestTeacherAuthenticationDtoAsync() {
+            await SeedTestUsersAsync();
+            return new UserForAuthenticationDto() {
+                UserName = TEACHER_SEED_EMAIL,
+                Password = TEACHER_SEED_PASSWORD
+            };
+        }
+
+        /// <summary>
+        /// Gets a Token for a logged in test student.
+        /// </summary>
+        /// <returns>TokenDto</returns>
+        internal async Task<TokenDto> LogInTestStudentAsync() {
+            return await LogInTestUserAsync(await GetTestStudentAuthenticationDtoAsync());
+        }
+
+        /// <summary>
+        /// Gets a Token for a logged in test teacher.
+        /// </summary>
+        /// <returns>TokenDto</returns>
+        internal async Task<TokenDto> LogInTestTeacherAsync() {
+            return await LogInTestUserAsync(await GetTestTeacherAuthenticationDtoAsync());
+        }
+
+        /// <summary>
+        /// Gets a Token for a user.
+        /// </summary>
+        /// <returns>TokenDto</returns>
+        private async Task<TokenDto> LogInTestUserAsync(UserForAuthenticationDto authDto) {
+            var baseResponse = await _httpClient.PostAsJsonAsync("api/authentication/login", authDto);
             var jsonResponse = await baseResponse.Content.ReadAsStringAsync();
             return JsonConvert.DeserializeObject<TokenDto>(jsonResponse);
         }
 
-        internal Course SeedCourse() {
-            return new Course() {
+        private Course SeedCourse() {
+            _seededCourse ??= new Course() {
                 Description = "This is a second test course",
                 CourseName = "Test course 2",
                 StartDate = DateOnly.MinValue,
@@ -106,6 +151,8 @@ namespace Cognita_Tests
                     }
                 }
             };
+
+            return _seededCourse;
         }
     }
 }
