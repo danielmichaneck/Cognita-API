@@ -11,20 +11,6 @@ public class ActivityRepository : RepositoryBase<Activity>, IActivityRepository 
         : base(context) { }
 
     public async Task CreateActivityAsync(Activity activity, int courseId, int moduleId) {
-        /*var module = await Context
-            .Course.Where(c => c.CourseId == courseId).Select<>
-
-
-            .Include(c => c.Modules)
-            .FirstOrDefaultAsync(c => c.CourseId == courseId);*/
-       
-            
-
-        //TODO
-        //Throw and catch custom exception
-        //ArgumentNullException.ThrowIfNull(module);
-
-        //module.Activities.Add(activity);
         throw new NotImplementedException();
     }
 
@@ -38,12 +24,4 @@ public class ActivityRepository : RepositoryBase<Activity>, IActivityRepository 
 
     public async Task<Activity?> GetSingleActivityAsync(int id, bool trackChanges = false) =>
         await GetByCondition(a => a.ActivityId == id, trackChanges).FirstOrDefaultAsync();
-
-    // public Task<bool> EditModuleAsync(int id, Module module) { }
-
-    /*public async Task<IEnumerable<Module>> GetAllModulesAsync(int courseId) =>
-        await GetByCondition(m => m.CourseId == courseId).ToListAsync();
-
-    public async Task<Module?> GetSingleModuleAsync(int id, bool trackChanges) =>
-        await GetByCondition(m => m.ModuleId == id, trackChanges).FirstOrDefaultAsync();*/
 }

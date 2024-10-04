@@ -20,28 +20,6 @@ namespace Cognita_API.Controllers
             _serviceManager = serviceManager;
         }
 
-        [HttpGet("courses/{id}/modules/{id2}/activities")]
-        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(ActivityDto))]
-        [ProducesResponseType(StatusCodes.Status404NotFound)]
-        [SwaggerOperation(
-            Summary = "Get all activities for a module",
-            Description = "Get all available activities for a module",
-            OperationId = "GetActivitiesForModule"
-        )]
-        [SwaggerResponse(StatusCodes.Status200OK, "Activities found", Type = typeof(ActivityDto))]
-        [SwaggerResponse(StatusCodes.Status404NotFound, "No activities found")]
-        public async Task<ActionResult<IEnumerable<ActivityDto>>> GetActivitiesForModule(int id)
-        {
-            var activities = await _serviceManager.ActivityService.GetActivitiesAsync(id);
-
-            if (activities == null)
-            {
-                return NotFound();
-            }
-
-            return Ok(activities);
-        }
-
         [HttpPost("courses/{id}/modules/{id2}/activities")]
         [Authorize(Roles = "Admin")]
         [ProducesResponseType(StatusCodes.Status201Created)]
