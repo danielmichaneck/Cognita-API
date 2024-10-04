@@ -42,7 +42,7 @@ namespace Cognita_Tests
 
             // Act
 
-            var response = await _httpClient.PostAsJsonAsync(baseHttpAddress + "authentication/login", testUser);
+            var response = await _httpClient.PostAsJsonAsync("api/authentication/login", testUser);
 
             // Assert
 
@@ -67,7 +67,7 @@ namespace Cognita_Tests
             // Act
 
             _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token.AccessToken);
-            var response = await _httpClient.PostAsJsonAsync(baseHttpAddress + "authentication", newUser);
+            var response = await _httpClient.PostAsJsonAsync("api/authentication", newUser);
 
             // Assert
 
@@ -93,11 +93,35 @@ namespace Cognita_Tests
             // Act
 
             _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token.AccessToken);
-            var response = await _httpClient.PostAsJsonAsync(baseHttpAddress + "authentication", newUser);
+            var response = await _httpClient.PostAsJsonAsync("api/authentication", newUser);
 
             // Assert
 
             Assert.True(response.StatusCode == HttpStatusCode.Forbidden);
+        }
+
+        [Fact]
+        public async Task Get_Correct_Student_Role_Success_Test()
+        {
+            // Arrange
+
+            var token = await _util.LogInTestStudentAsync();
+
+            // Assert
+
+            Assert.True(token.Role == "User");
+        }
+
+        [Fact]
+        public async Task Get_Correct_Teacher_Role_Success_Test()
+        {
+            // Arrange
+
+            var token = await _util.LogInTestTeacherAsync();
+
+            // Assert
+
+            Assert.True(token.Role == "Admin");
         }
 
         [Fact]

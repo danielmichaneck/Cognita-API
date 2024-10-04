@@ -26,6 +26,7 @@ public class AuthService : IAuthService
     private readonly ICourseService _courseService;
     private readonly CognitaDbContext _context;
     private ApplicationUser? _user;
+    private string _roleAsString;
 
     public AuthService(
         UserManager<ApplicationUser> userManager,
@@ -71,7 +72,7 @@ public class AuthService : IAuthService
         var res = await _userManager.UpdateAsync(_user); //TODO: Validate res!
         string accessToken = new JwtSecurityTokenHandler().WriteToken(tokenOptions);
 
-        return new TokenDto(accessToken, _user.RefreshToken);
+        return new TokenDto(accessToken, _user.RefreshToken, _roleAsString);
     }
 
     private string GenerateRefreshToken()
@@ -115,6 +116,7 @@ public class AuthService : IAuthService
                     new Claim(ClaimTypes.NameIdentifier, _user.Id.ToString()!),
                     new Claim(ClaimTypes.Role, "Admin")
                 };
+                _roleAsString = "Admin";
                 break;
 
             default:
@@ -123,6 +125,7 @@ public class AuthService : IAuthService
                     new Claim(ClaimTypes.NameIdentifier, _user.Id.ToString()!),
                     new Claim(ClaimTypes.Role, "User")
                 };
+                _roleAsString = "User";
                 break;
         }
 
