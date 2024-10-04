@@ -25,8 +25,8 @@ namespace Cognita_API.Controllers
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(CourseDto))]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [SwaggerOperation(
-            Summary = "Get all courses",
-            Description = "Get all available courses",
+            Summary = "Get all applicable courses",
+            Description = "Get all applicable courses",
             OperationId = "GetAllCourses"
         )]
         [SwaggerResponse(StatusCodes.Status200OK, "Courses found", Type = typeof(CourseDto))]
@@ -72,7 +72,7 @@ namespace Cognita_API.Controllers
                 }
             }
 
-            return BadRequest();
+            return NotFound();
         }
 
         // GET: api/Courses/5
