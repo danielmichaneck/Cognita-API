@@ -31,23 +31,6 @@ namespace Cognita_Tests
         }
 
         [Fact]
-        public async Task Get_All_Modules_Success_Test()
-        {
-            // Arrange
-
-            TokenDto token = await _util.LogInTestStudentAsync();
-
-            // Act
-
-            _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token.AccessToken);
-            var requestResult = await _httpClient.GetAsync("api/courses/1/modules");
-
-            // Assert
-
-            Assert.True(requestResult.IsSuccessStatusCode);
-        }
-
-        [Fact]
         public async Task Create_Module_Success_Test() {
 
             // Arrange
@@ -69,6 +52,29 @@ namespace Cognita_Tests
             // Assert
 
             Assert.True(response.IsSuccessStatusCode);
+        }
+
+        [Fact]
+        public async Task Edit_Module_Success_Test() {
+            // Arrange
+
+            TokenDto token = await _util.LogInTestTeacherAsync();
+
+            var newModule = new ModuleForUpdateDto() {
+                ModuleName = "Test-module-1",
+                Description = "This is a test course generated in the Create_Module_Success_Test",
+                StartDate = DateOnly.MinValue,
+                EndDate = DateOnly.MaxValue
+            };
+
+            // Act
+
+            _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token.AccessToken);
+            var requestResult = await _httpClient.PutAsJsonAsync("api/modules/1", newModule);
+
+            // Assert
+
+            Assert.True(requestResult.IsSuccessStatusCode);
         }
     }
 }

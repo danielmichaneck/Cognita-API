@@ -1,6 +1,5 @@
 using System;
 using Cognita_Shared.Dtos.User;
-using Cognita_Shared.Entities;
 
 namespace Cognita_Service.Contracts;
 

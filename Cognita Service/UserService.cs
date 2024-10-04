@@ -2,6 +2,7 @@ using System;
 using System.Linq;
 using AutoMapper;
 using Cognita_Domain.Contracts;
+using Cognita_Infrastructure.Models.Dtos;
 using Cognita_Service.Contracts;
 using Cognita_Shared.Dtos.User;
 using Cognita_Shared.Entities;

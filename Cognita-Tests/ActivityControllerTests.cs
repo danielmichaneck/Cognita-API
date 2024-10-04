@@ -28,31 +28,6 @@ namespace Cognita_Tests {
             _util = new TestUtil(_userManager, _httpClient);
         }
 
-        /*[Fact]
-        public async Task Get_All_Modules_Success_Test() {
-            // Arrange
-
-            TokenDto token = await _util.LogInTestStudentAsync();
-            bool success = false;
-
-            // Act
-
-            using (var requestMessage = new HttpRequestMessage(HttpMethod.Get, "api/courses/1/modules")) {
-                requestMessage.Headers.Authorization =
-                    new AuthenticationHeaderValue("Bearer", token.AccessToken);
-
-                var requestResult = await _httpClient.SendAsync(requestMessage);
-
-                if (requestResult.IsSuccessStatusCode) {
-                    success = true;
-                }
-            }
-
-            // Assert
-
-            Assert.True(success);
-        }*/
-
         [Fact]
         public async Task Create_Activity_Success_Test() {
 
