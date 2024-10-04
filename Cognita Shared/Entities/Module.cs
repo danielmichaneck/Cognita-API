@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 
 namespace Cognita_Shared.Entities {
-    public class Module : DocumentHolderBase {
+    public class Module {
         public int ModuleId { get; set; }
         public required string ModuleName { get; set; }
         public required string Description { get; set; }
@@ -14,8 +14,10 @@ namespace Cognita_Shared.Entities {
 
         // Foreign Key
         public int CourseId { get; set; }
+        public int FilesId { get; set; }
 
         //Navigationprops
         public ICollection<Activity> Activities { get; set; }
+        public DocumentHolder Files {  get; set; }
     }
 }

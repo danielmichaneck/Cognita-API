@@ -23,6 +23,22 @@ namespace Cognita_Infrastructure.Data
 
             modelBuilder.Entity<ApplicationUser>()
                 .Property("Email").IsRequired();
+
+            modelBuilder.Entity<ApplicationUser>()
+                .HasMany(u => u.Documents)
+                .WithOne();
+
+            modelBuilder.Entity<Course>()
+                .HasOne(c => c.Files)
+                .WithOne();
+
+            modelBuilder.Entity<Module>()
+                .HasOne(c => c.Files)
+                .WithOne();
+
+            modelBuilder.Entity<Activity>()
+                .HasOne(c => c.Files)
+                .WithOne();
         }
     }
 }

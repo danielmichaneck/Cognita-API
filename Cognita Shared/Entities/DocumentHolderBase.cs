@@ -7,6 +7,6 @@ using System.Threading.Tasks;
 
 namespace Cognita_Shared.Entities {
     public class DocumentHolderBase {
-        public ICollection<Document> Docs { get; set; }
+        public ICollection<Document> Documents { get; set; }
     }
 }
