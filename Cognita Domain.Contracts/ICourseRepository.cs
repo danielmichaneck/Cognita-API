@@ -7,6 +7,7 @@ public interface ICourseRepository
 {
     Task<IEnumerable<Course>> GetAllCoursesAsync();
     Task<Course?> GetSingleCourseAsync(int id, bool trackChanges = false);
+    Task<Course?> GetSingleCourseWithoutDetailsAsync(int id, bool trackChanges = false);
     Task CreateCourseAsync(Course course);
 
     //TODO Delete?

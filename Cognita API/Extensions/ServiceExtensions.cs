@@ -1,13 +1,13 @@
 ﻿using System.Text;
 using Cognita.API.Service.Contracts;
 using Cognita.API.Services;
-using Cognita_API.Infrastructure.Data;
 using Cognita_Domain.Contracts;
 using Cognita_Domain.Repositories;
 using Cognita_Infrastructure.Data;
 using Cognita_Service;
 using Cognita_Service.Contracts;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 
@@ -66,6 +66,7 @@ public static class ServiceExtensions
         services.AddScoped<IServiceManager, ServiceManager>();
         services.AddScoped<ICourseService, CourseService>();
         services.AddScoped<IModuleService, ModuleService>();
+        services.AddScoped<IActivityService, ActivityService>();
         services.AddScoped<IUserService, UserService>();
         services.AddScoped<IAuthService, AuthService>();
 
@@ -78,6 +79,9 @@ public static class ServiceExtensions
         services.AddScoped(provider => new Lazy<IModuleService>(
             () => provider.GetRequiredService<IModuleService>()
         ));
+        services.AddScoped(provider => new Lazy<IActivityService>(
+            () => provider.GetRequiredService<IActivityService>()
+        ));
         services.AddScoped(provider => new Lazy<IUserService>(
             () => provider.GetRequiredService<IUserService>()
         ));
@@ -88,12 +92,20 @@ public static class ServiceExtensions
         services.AddScoped<IUoW, UoW>();
         services.AddScoped<ICourseRepository, CourseRepository>();
         services.AddScoped<IModuleRepository, ModuleRepository>();
+        services.AddScoped<IActivityRepository, ActivityRepository>();
+        services.AddScoped<IActivityTypeRepository, ActivityTypeRepository>();
         services.AddScoped<IUserRepository, UserRepository>();
         services.AddScoped(provider => new Lazy<ICourseRepository>(
             () => provider.GetRequiredService<ICourseRepository>()
         ));
         services.AddScoped(provider => new Lazy<IModuleRepository>(
             () => provider.GetRequiredService<IModuleRepository>()
+        ));
+        services.AddScoped(provider => new Lazy<IActivityRepository>(
+            () => provider.GetRequiredService<IActivityRepository>()
+        ));
+        services.AddScoped(provider => new Lazy<IActivityTypeRepository>(
+            () => provider.GetRequiredService<IActivityTypeRepository>()
         ));
         services.AddScoped(provider => new Lazy<IUserRepository>(
             () => provider.GetRequiredService<IUserRepository>()
@@ -125,7 +137,8 @@ public static class ServiceExtensions
                     ValidateIssuerSigningKey = true,
                     ValidIssuer = jwtSettings["Issuer"],
                     ValidAudience = jwtSettings["Audience"],
-                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(secretkey))
+                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(secretkey)),
+                    ClockSkew = TimeSpan.Zero
                 };
             });
     }
@@ -135,17 +148,37 @@ public static class ServiceExtensions
         using (var scope = app.ApplicationServices.CreateScope())
         {
             var serviceProvider = scope.ServiceProvider;
-            var context = serviceProvider.GetRequiredService<CognitaDbContext>();
+            //var context = serviceProvider.GetRequiredService<CognitaDbContext>();
 
             try
             {
-                await SeedData.InitAsync(context);
+                await SeedData.InitAsync(serviceProvider);
             }
             catch (Exception ex)
             {
                 Console.WriteLine(ex.Message);
                 throw;
             }
+        }
+    }
+
+    public static async Task CreateRolesAsync(this IApplicationBuilder app)
+    {
+        var roleManager = app
+            .ApplicationServices
+            .CreateScope()
+            .ServiceProvider
+            .GetRequiredService<RoleManager<IdentityRole<int>>>();
+
+        string[] roleNames = ["Admin", "User"];
+
+        foreach (var roleName in roleNames)
+        {
+            if (await roleManager.RoleExistsAsync(roleName)) continue;
+            var Role = new IdentityRole<int> { Name = roleName };
+            var result = await roleManager.CreateAsync(Role);
+
+            if (!result.Succeeded) throw new Exception(string.Join("\n", result.Errors));
         }
     }
 }

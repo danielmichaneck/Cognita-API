@@ -2,47 +2,77 @@
 using System.Security.Claims;
 using System.Security.Cryptography;
 using System.Text;
+using AutoMapper;
 using Cognita.API.Service.Contracts;
+using Cognita_Infrastructure.Data;
 using Cognita_Infrastructure.Models.Dtos;
 using Cognita_Infrastructure.Models.Entities;
+using Cognita_Service.Contracts;
+using Cognita_Shared.Dtos.Course;
+using Cognita_Shared.Dtos.User;
+using Cognita_Shared.Enums;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 
 namespace Cognita.API.Services;
 
 public class AuthService : IAuthService
 {
-    private readonly UserManager<ApplicationUser> userManager;
-    private readonly IConfiguration configuration;
-    private ApplicationUser? user;
+    private readonly UserManager<ApplicationUser> _userManager;
+    private readonly RoleManager<IdentityRole<int>> _roleManager;
+    private readonly IConfiguration _configuration;
+    private readonly IMapper _mapper;
+    private readonly ICourseService _courseService;
+    private readonly CognitaDbContext _context;
+    private ApplicationUser? _user;
+    private string _roleAsString;
 
     public AuthService(
         UserManager<ApplicationUser> userManager,
-        RoleManager<IdentityRole> roleManager,
-        IConfiguration configuration
+        RoleManager<IdentityRole<int>> roleManager,
+        IConfiguration configuration,
+        IMapper mapper,
+        ICourseService courseService,
+        CognitaDbContext context
     )
     {
-        this.userManager = userManager;
-        this.configuration = configuration;
+        _userManager = userManager;
+        _roleManager = roleManager;
+        _configuration = configuration;
+        _mapper = mapper;
+        _courseService = courseService;
+        _context = context;
     }
 
-    public async Task<TokenDto> CreateTokenAsync(bool expireTime)
+    /// <summary>
+    /// Creates a new TokenDto, a tuple of an access token and a refresh token.
+    /// </summary>
+    /// <param name="refreshTokenExpireTime">Time in milliseconds that a refresh token should be valid for. Should be larger than accessTokenExpireTime.</param>
+    /// <param name="accessTokenExpireTime">Time in milliseconds that an access token should be valid for. Should be smaller than refreshTokenExpireTime.</param>
+    /// <param name="expires">Dictates if the TokenDto should expire or not.</param>
+    /// <returns></returns>
+
+    public async Task<TokenDto> CreateTokenAsync(bool expires = true)
     {
+        var jwtSettings = _configuration.GetSection("JwtSettings");
+
         SigningCredentials signing = GetSigningCredentials();
-        IEnumerable<Claim> claims = GetClaims();
-        JwtSecurityToken tokenOptions = GenerateTokenOptions(signing, claims);
+        IEnumerable<Claim> claims = await GetClaims();
+        JwtSecurityToken tokenOptions = GenerateTokenOptions(signing, claims, long.Parse(jwtSettings["accessTokenExpirationTime"]));
 
-        ArgumentNullException.ThrowIfNull(user, nameof(user));
+        ArgumentNullException.ThrowIfNull(_user, nameof(_user));
 
-        user.RefreshToken = GenerateRefreshToken();
+        _user.RefreshToken = GenerateRefreshToken();
 
-        if (expireTime)
-            user.RefreshTokenExpireTime = DateTime.UtcNow.AddDays(2);
+        if (expires)
+            _user.RefreshTokenExpireTime = DateTime.UtcNow.AddMilliseconds(long.Parse(jwtSettings["refreshTokenExpirationTime"]));
 
-        var res = await userManager.UpdateAsync(user); //ToDo validate res!
+
+        var res = await _userManager.UpdateAsync(_user); //TODO: Validate res!
         string accessToken = new JwtSecurityTokenHandler().WriteToken(tokenOptions);
 
-        return new TokenDto(accessToken, user.RefreshToken);
+        return new TokenDto(accessToken, _user.RefreshToken, _roleAsString);
     }
 
     private string GenerateRefreshToken()
@@ -55,39 +85,56 @@ public class AuthService : IAuthService
 
     private JwtSecurityToken GenerateTokenOptions(
         SigningCredentials signing,
-        IEnumerable<Claim> claims
+        IEnumerable<Claim> claims,
+        long  accessTokenExpireTime
     )
     {
-        var jwtSettings = configuration.GetSection("JwtSettings");
+        var jwtSettings = _configuration.GetSection("JwtSettings");
 
         var tokenOptions = new JwtSecurityToken(
             issuer: jwtSettings["Issuer"],
             audience: jwtSettings["Audience"],
             claims: claims,
-            expires: DateTime.Now.AddMinutes(Convert.ToDouble(jwtSettings["Expires"])),
+            expires: DateTime.Now.AddMilliseconds(accessTokenExpireTime),
             signingCredentials: signing
         );
 
         return tokenOptions;
     }
 
-    private IEnumerable<Claim> GetClaims()
+    private async Task<IEnumerable<Claim>> GetClaims()
     {
-        ArgumentNullException.ThrowIfNull(user);
+        ArgumentNullException.ThrowIfNull(_user);
 
-        var claims = new List<Claim>()
-        {
-            new Claim(ClaimTypes.Name, user.UserName!),
-            new Claim(ClaimTypes.NameIdentifier, user.Id!)
-            //Add more if needed
-        };
+        List<Claim> claims;
+
+        // Needed to customize claims.
+        switch (await GetRoleAsync(_user)) {
+            case UserRole.Teacher:
+                claims = new List<Claim>() {
+                    new Claim(ClaimTypes.Name, _user.UserName!),
+                    new Claim(ClaimTypes.NameIdentifier, _user.Id.ToString()!),
+                    new Claim(ClaimTypes.Role, "Admin")
+                };
+                _roleAsString = "Admin";
+                break;
+
+            default:
+                claims = new List<Claim>() {
+                    new Claim(ClaimTypes.Name, _user.UserName!),
+                    new Claim(ClaimTypes.NameIdentifier, _user.Id.ToString()!),
+                    new Claim(ClaimTypes.Role, "User")
+                };
+                _roleAsString = "User";
+                break;
+        }
 
         return claims;
     }
 
     private SigningCredentials GetSigningCredentials()
     {
-        string? secretKey = configuration["secretkey"];
+        string? secretKey = _configuration["secretkey"];
         ArgumentNullException.ThrowIfNull(secretKey, nameof(secretKey));
 
         byte[] key = Encoding.UTF8.GetBytes(secretKey);
@@ -100,18 +147,26 @@ public class AuthService : IAuthService
     {
         ArgumentNullException.ThrowIfNull(userForRegistration, nameof(userForRegistration));
 
-        var user = new ApplicationUser
-        {
+        var user = new ApplicationUser {
             Email = userForRegistration.Email,
-
-            User = new Cognita_Shared.Entities.User
-            {
-                CourseId = userForRegistration.CourseId,
-                Name = userForRegistration.Name
-            }
+            UserName = userForRegistration.Email,
+            Name = userForRegistration.Name
         };
 
-        IdentityResult result = await userManager.CreateAsync(user, userForRegistration.Password!);
+        var course = await _courseService.GetCourse(userForRegistration.CourseId);
+
+        if (course is null) throw new ArgumentException("The course does not exist.");
+
+        user.Courses = [course];
+
+        IdentityResult result = await _userManager.CreateAsync(user, userForRegistration.Password!);
+
+        // ToDo: Set up roles in configuration
+        if (userForRegistration.Role == UserRole.Teacher) {
+            await _userManager.AddToRoleAsync(user, "Admin");
+        } else {
+            await _userManager.AddToRoleAsync(user, "User");
+        }
 
         return result;
     }
@@ -120,16 +175,16 @@ public class AuthService : IAuthService
     {
         ArgumentNullException.ThrowIfNull(userDto, nameof(userDto));
 
-        user = await userManager.FindByNameAsync(userDto.UserName!);
+        _user = await _userManager.FindByNameAsync(userDto.UserName!);
 
-        return user != null && await userManager.CheckPasswordAsync(user, userDto.Password!);
+        return _user != null && await _userManager.CheckPasswordAsync(_user, userDto.Password!);
     }
 
     public async Task<TokenDto> RefreshTokenAsync(TokenDto token)
     {
         ClaimsPrincipal principal = GetPrincipalFromExpiredToken(token.AccessToken);
 
-        ApplicationUser? user = await userManager.FindByNameAsync(principal.Identity?.Name!);
+        ApplicationUser? user = await _userManager.FindByNameAsync(principal.Identity?.Name!);
         if (
             user == null
             || user.RefreshToken != token.RefreshToken
@@ -138,16 +193,16 @@ public class AuthService : IAuthService
             //ToDo: Handle with middleware and custom exception class
             throw new ArgumentException("The TokenDto has som invalid values");
 
-        this.user = user;
+        this._user = user;
 
-        return await CreateTokenAsync(expireTime: false);
+        return await CreateTokenAsync();
     }
 
     private ClaimsPrincipal GetPrincipalFromExpiredToken(string accessToken)
     {
-        IConfigurationSection jwtSettings = configuration.GetSection("JwtSettings");
+        IConfigurationSection jwtSettings = _configuration.GetSection("JwtSettings");
 
-        string? secretKey = configuration["secretkey"];
+        string? secretKey = _configuration["secretkey"];
         ArgumentNullException.ThrowIfNull(nameof(secretKey));
 
         TokenValidationParameters tokenValidationParameters =
@@ -182,5 +237,79 @@ public class AuthService : IAuthService
         }
 
         return principal;
+    }
+
+    public async Task<UserDto?> GetUserAsync(int id) {
+        var user = await _userManager.FindByIdAsync(id.ToString());
+        if (user is null) return null;
+        return _mapper.Map<UserDto>(user);
+    }
+
+    public async Task<IEnumerable<UserDto>> GetUsersAsync(int? courseId = null) {
+        var users = await _userManager.Users.Include(u => u.Courses).ToListAsync();
+        var userDtos = new List<UserDto>();
+        if (courseId is null) {
+            return await CreateUserDtos(users);
+        }
+
+        var courseUsers = users.Where(u => u.Courses
+                                .Where(c => c.CourseId == courseId)
+                                .Any())
+                               .ToList();
+
+        return await CreateUserDtos(courseUsers);
+    }
+
+    public async Task<IEnumerable<CourseDto>> GetCoursesForUserAsync(int userId)
+    {
+        var user = await _context.Users.Where(u => u.Id == userId).Include(u => u.Courses).FirstOrDefaultAsync() ??
+            throw new NullReferenceException("User is null.");
+
+        return _mapper.Map<IEnumerable<CourseDto>>(user.Courses);
+    }
+
+    public async Task<bool> UpdateUser(int id, UserForUpdateDto dto) {
+        var user = await _userManager.FindByIdAsync(id.ToString());
+        if (user is null) return false;
+        _mapper.Map(dto, user);
+        user.UserName = dto.Email;
+        user.NormalizedUserName = dto.Email.Normalize();
+        user.NormalizedEmail = dto.Email.Normalize();
+        await _userManager.UpdateAsync(user);
+        await _context.SaveChangesAsync();
+        return true;
+    }
+
+    private async Task<List<UserDto>> CreateUserDtos(List<ApplicationUser> users)
+    {
+        var userDtos = new List<UserDto>();
+        foreach (ApplicationUser user in users)
+        {
+            if (user.Courses is null) throw new NullReferenceException("User courses is null");
+            var userDto = _mapper.Map<UserDto>(user);
+            var course = user.Courses.FirstOrDefault();
+            if (course is null) throw new ArgumentException("A user has null or default courses.");
+            userDto.CourseName = course.CourseName;
+            userDto.CourseId = course.CourseId;
+            userDto.Role = await GetRoleAsync(user);
+            userDtos.Add(userDto);
+        }
+        return userDtos;
+    }
+
+    private async Task<UserRole> GetRoleAsync(ApplicationUser user)
+    {
+        var roles = await _userManager.GetRolesAsync(user);
+        switch (roles.FirstOrDefault())
+        {
+            case "Admin":
+                return UserRole.Teacher;
+
+            case "User":
+                return UserRole.Student;
+
+            default:
+                throw new ArgumentException("The user does not have a valid role.");
+        }
     }
 }

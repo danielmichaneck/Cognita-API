@@ -10,6 +10,7 @@ internal class CourseProfile : Profile
     public CourseProfile()
     {
         CreateMap<Course, CourseDto>().ReverseMap();
+        CreateMap<Course, CourseWithDetailsDto>().ReverseMap();
         CreateMap<Course, CourseForCreationDto>().ReverseMap();
         CreateMap<Course, CourseForUpdateDto>().ReverseMap();
     }
